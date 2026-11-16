@@ -1790,7 +1790,7 @@ CH.RULES = [
   var Net = CH.Net = {};
   var PREFIX = 'chuma-na-vse-doma-v1-';
   var qs = new URLSearchParams(location.search);
-  Net.mode = qs.get('net') === 'local' ? 'local' : 'peer';
+  Net.mode = qs.get('net') === 'local' ? 'local' : qs.get('net') === 'peer' ? 'peer' : 'mqtt';
   Net.CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   Net.newCode = function () { var s = ''; for (var i = 0; i < 4; i++) s += Net.CODE_CHARS[Math.floor(Math.random() * Net.CODE_CHARS.length)]; return s; };
 
@@ -1820,6 +1820,7 @@ CH.RULES = [
   // h: { onMessage(connId, msg), onLeave(connId), onStatus(text) }
   Net.host = function (code, h) {
     if (Net.mode === 'local') return localHost(code, h);
+    if (Net.mode === 'mqtt') return Net.mqttHost(code, h);
     return loadPeer().then(function () {
       return new Promise(function (res, rej) {
         var conns = {}, opened = false, attempts = 0, peer;
@@ -1861,6 +1862,7 @@ CH.RULES = [
   // h: { onOpen(), onMessage(msg), onClose(), onStatus(text) }
   Net.join = function (code, h) {
     if (Net.mode === 'local') return localJoin(code, h);
+    if (Net.mode === 'mqtt') return Net.mqttJoin(code, h);
     var peer = null, conn = null, closed = false, retry = null, notFound = 0;
     var api = {
       send: function (m) { if (conn && conn.open) { try { conn.send(JSON.stringify(m)); } catch (e) {} } },
@@ -1943,6 +1945,224 @@ CH.RULES = [
 })();
 
 // ============================================================
+//  Связь через публичные MQTT-серверы (WebSocket), без библиотек.
+//  Хост слушает все серверы сразу, игрок берёт первый ответивший.
+// ============================================================
+(function () {
+  var CH = window.CH, Net = CH.Net;
+  var enc = new TextEncoder(), dec = new TextDecoder();
+  var qs = new URLSearchParams(location.search);
+  Net.BROKERS = qs.get('brokers') ? qs.get('brokers').split(',') : [
+    'wss://broker.emqx.io:8084/mqtt',
+    'wss://broker.hivemq.com:8884/mqtt',
+    'wss://test.mosquitto.org:8081/mqtt',
+    'wss://mqtt.eclipseprojects.io:443/mqtt'
+  ];
+  Net.BROKER_NAMES = ['EMQX', 'HiveMQ', 'Mosquitto', 'Eclipse'];
+  var ROOT = 'chumanadoma1/';
+  var CHUNK = 30000;
+
+  // ---------- кодирование пакетов MQTT 3.1.1 ----------
+  function str(s) { var b = enc.encode(s), o = new Uint8Array(2 + b.length); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
+  function varint(n) { var out = []; do { var d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; out.push(d); } while (n > 0); return out; }
+  function pkt(b0, parts) {
+    var len = 0; parts.forEach(function (p) { len += p.length; });
+    var vi = varint(len), o = new Uint8Array(1 + vi.length + len), off = 1 + vi.length;
+    o[0] = b0; o.set(vi, 1);
+    parts.forEach(function (p) { o.set(p, off); off += p.length; });
+    return o;
+  }
+  function rid(n) { var s = '', a = 'abcdefghijklmnopqrstuvwxyz0123456789'; for (var i = 0; i < n; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
+
+  // ---------- мини-клиент ----------
+  function Mqtt(url, onMsg, onState) {
+    this.url = url; this.onMsg = onMsg; this.onState = onState;
+    this.subs = []; this.ready = false; this.ws = null; this.closed = false; this.pid = 1;
+  }
+  Mqtt.prototype.connect = function () {
+    var self = this; if (self.closed || self.ws) return;
+    var ws;
+    try { ws = new WebSocket(self.url, ['mqtt']); } catch (e) { setTimeout(function () { self.onState('closed', false); }, 0); return; }
+    ws.binaryType = 'arraybuffer'; self.ws = ws; self.buf = new Uint8Array(0); self.ready = false;
+    var to = setTimeout(function () { if (!self.ready) try { ws.close(); } catch (e) {} }, 9000);
+    ws.onopen = function () { ws.send(pkt(0x10, [str('MQTT'), Uint8Array.of(4, 2, 0, 60), str('chm' + rid(14))])); };
+    ws.onmessage = function (e) { if (typeof e.data !== 'string') self.feed(new Uint8Array(e.data)); };
+    ws.onerror = function () {};
+    ws.onclose = function () {
+      clearTimeout(to); clearInterval(self.pingT);
+      if (self.ws !== ws) return;
+      var was = self.ready; self.ws = null; self.ready = false;
+      self.onState('closed', was);
+    };
+  };
+  Mqtt.prototype.feed = function (chunk) {
+    var b = new Uint8Array(this.buf.length + chunk.length); b.set(this.buf); b.set(chunk, this.buf.length);
+    while (b.length >= 2) {
+      var mult = 1, rl = 0, i = 1, d;
+      do { if (i >= b.length) return void (this.buf = b); d = b[i++]; rl += (d & 127) * mult; mult *= 128; } while (d & 128);
+      if (b.length < i + rl) break;
+      this.handle(b[0], b.subarray(i, i + rl));
+      b = b.slice(i + rl);
+    }
+    this.buf = b;
+  };
+  Mqtt.prototype.handle = function (b0, p) {
+    var self = this, type = b0 >> 4;
+    if (type === 2) { // CONNACK
+      if (p[1] !== 0) { try { self.ws.close(); } catch (e) {} return; }
+      self.ready = true;
+      self.subs.forEach(function (t) { self.sendSub(t); });
+      self.pingT = setInterval(function () { self.raw(Uint8Array.of(0xC0, 0)); }, 25000);
+      self.onState('open');
+    } else if (type === 3) { // PUBLISH
+      var qos = (b0 >> 1) & 3, tl = (p[0] << 8) | p[1], topic = dec.decode(p.subarray(2, 2 + tl)), off = 2 + tl;
+      if (qos > 0) { var id1 = p[off], id2 = p[off + 1]; off += 2; if (qos === 1) self.raw(Uint8Array.of(0x40, 2, id1, id2)); }
+      try { self.onMsg(topic, dec.decode(p.subarray(off))); } catch (e) { console.error(e); }
+    }
+  };
+  Mqtt.prototype.raw = function (bytes) { if (this.ws && this.ws.readyState === 1) { try { this.ws.send(bytes); return true; } catch (e) {} } return false; };
+  Mqtt.prototype.sendSub = function (t) { this.pid = this.pid % 60000 + 1; this.raw(pkt(0x82, [Uint8Array.of(this.pid >> 8, this.pid & 255), str(t), Uint8Array.of(0)])); };
+  Mqtt.prototype.subscribe = function (t) { this.subs.push(t); if (this.ready) this.sendSub(t); };
+  Mqtt.prototype.publish = function (t, s) { if (!this.ready) return false; return this.raw(pkt(0x30, [str(t), enc.encode(s)])); };
+  Mqtt.prototype.close = function () { this.closed = true; clearInterval(this.pingT); if (this.ws) { try { this.raw(Uint8Array.of(0xE0, 0)); this.ws.close(); } catch (e) {} } };
+  Net.Mqtt = Mqtt;
+
+  // ---------- конверты с нарезкой больших сообщений ----------
+  function sendEnv(m, topic, env) {
+    var s = JSON.stringify(env);
+    if (s.length <= CHUNK) return m.publish(topic, s);
+    var id = rid(6), n = Math.ceil(s.length / CHUNK), ok = true;
+    for (var i = 0; i < n; i++) ok = m.publish(topic, JSON.stringify({ f: env.f, k: 'part', id: id, i: i, n: n, s: s.slice(i * CHUNK, (i + 1) * CHUNK) })) && ok;
+    return ok;
+  }
+  function Assembler() { this.parts = {}; }
+  Assembler.prototype.take = function (raw) {
+    var env; try { env = JSON.parse(raw); } catch (e) { return null; }
+    if (env.k !== 'part') return env;
+    var p = this.parts[env.id] = this.parts[env.id] || { n: env.n, got: 0, s: [], t: Date.now() };
+    if (p.s[env.i] == null) { p.s[env.i] = env.s; p.got++; }
+    var now = Date.now(); for (var k in this.parts) if (now - this.parts[k].t > 60000) delete this.parts[k];
+    if (p.got < p.n) return null;
+    delete this.parts[env.id];
+    try { return JSON.parse(p.s.join('')); } catch (e) { return null; }
+  };
+  function backoff(n) { return Math.min(15000, 1500 * Math.pow(1.6, n)) + Math.random() * 500; }
+
+  // ---------- Хост ----------
+  Net.mqttHost = function (code, h) {
+    var T = ROOT + code + '/', conns = {}, closed = false, asm = Net.BROKERS.map(function () { return new Assembler(); });
+    var brokers = Net.BROKERS.map(function (url, i) {
+      var fails = 0, m = new Mqtt(url, function (topic, raw) { onMsg(i, raw); }, function (s) {
+        if (s === 'open') { fails = 0; readyAny(); }
+        else if (!closed) setTimeout(function () { m.connect(); }, backoff(fails++));
+      });
+      m.subscribe(T + 'h'); m.connect(); return m;
+    });
+    function out(i, sid, env) { env.f = 'host'; var m = brokers[i]; if (m && m.ready) return sendEnv(m, T + 'c/' + sid, env); return false; }
+    function onMsg(i, raw) {
+      var env = asm[i].take(raw); if (!env || !env.f) return;
+      var sid = String(env.f).slice(0, 40), c = conns[sid], now = Date.now();
+      if (env.k === 'open') {
+        if (!c) conns[sid] = { b: i, last: now }; else { c.last = now; if (!brokers[c.b].ready) c.b = i; }
+        out(i, sid, { k: 'opened' });
+        return;
+      }
+      if (env.k === 'bye') { if (c) { delete conns[sid]; h.onLeave(sid); } return; }
+      if (!c) { c = conns[sid] = { b: i, last: now }; out(i, sid, { k: 'opened' }); }
+      c.b = i; c.last = now;
+      if (env.k === 'data') { var msg; try { msg = JSON.parse(env.d); } catch (e) { return; } h.onMessage(sid, msg); }
+    }
+    var hb = setInterval(function () {
+      var now = Date.now();
+      for (var sid in conns) {
+        if (now - conns[sid].last > 20000) { delete conns[sid]; h.onLeave(sid); continue; }
+        out(conns[sid].b, sid, { k: 'ping' });
+      }
+    }, 4000);
+    var api = {
+      send: function (sid, msg) { var c = conns[sid]; if (c) out(c.b, sid, { k: 'data', d: JSON.stringify(msg) }); },
+      close: function () { closed = true; clearInterval(hb); brokers.forEach(function (m) { m.close(); }); },
+      code: code
+    };
+    var resolveFn, rejectFn, done = false;
+    function readyAny() { if (!done) { done = true; resolveFn(api); } }
+    return new Promise(function (res, rej) {
+      resolveFn = res; rejectFn = rej;
+      setTimeout(function () { if (!done) h.onStatus && h.onStatus('Серверы связи отвечают медленно, жду…'); }, 6000);
+      setTimeout(function () { if (!done) { done = true; api.close(); rej(new Error('Не удалось связаться ни с одним сервером связи. Нажми «Проверка связи» на главном экране и пришли результат.')); } }, 25000);
+    });
+  };
+
+  // ---------- Игрок ----------
+  Net.mqttJoin = function (code, h) {
+    var T = ROOT + code + '/', sid = 'c' + rid(12), chosen = null, lastHost = 0, closed = false, started = Date.now(), anyReady = false;
+    var asm = Net.BROKERS.map(function () { return new Assembler(); });
+    var brokers = Net.BROKERS.map(function (url, i) {
+      var fails = 0, m = new Mqtt(url, function (topic, raw) { onMsg(i, raw); }, function (s) {
+        if (s === 'open') { fails = 0; anyReady = true; if (chosen == null) sendOpen(i); }
+        else {
+          if (chosen === i) { chosen = null; h.onClose(); }
+          if (!closed) setTimeout(function () { m.connect(); }, backoff(fails++));
+        }
+      });
+      m.subscribe(T + 'c/' + sid); m.connect(); return m;
+    });
+    function out(i, env) { env.f = sid; var m = brokers[i]; return m && m.ready ? sendEnv(m, T + 'h', env) : false; }
+    function sendOpen(i) { out(i, { k: 'open' }); }
+    function onMsg(i, raw) {
+      var env = asm[i].take(raw); if (!env || env.f !== 'host') return;
+      if (chosen != null && i !== chosen) { if (env.k === 'opened' && !brokers[chosen].ready) chosen = null; else return; }
+      lastHost = Date.now();
+      if (env.k === 'opened') { chosen = i; h.onOpen(); return; }
+      if (chosen == null) { chosen = i; h.onOpen(); }
+      if (env.k === 'data') { var msg; try { msg = JSON.parse(env.d); } catch (e) { return; } h.onMessage(msg); }
+      else if (env.k === 'ping') out(i, { k: 'ping' });
+    }
+    var hb = setInterval(function () {
+      if (closed) return;
+      if (chosen == null) {
+        brokers.forEach(function (m, i) { if (m.ready) sendOpen(i); });
+        var waited = Date.now() - started;
+        if (!anyReady && waited > 9000) h.onStatus && h.onStatus('Не могу связаться ни с одним сервером связи. Проверь интернет или нажми «Проверка связи».');
+        else if (anyReady && waited > 7000) h.onStatus && h.onStatus('Комната ' + code + ' молчит. Проверь код и что хост на экране игры.');
+      } else {
+        out(chosen, { k: 'ping' });
+        if (Date.now() - lastHost > 15000) { chosen = null; started = Date.now(); h.onClose(); }
+      }
+    }, 3000);
+    window.addEventListener('pagehide', function () { if (chosen != null) out(chosen, { k: 'bye' }); });
+    return {
+      send: function (m) { if (chosen != null) out(chosen, { k: 'data', d: JSON.stringify(m) }); },
+      close: function () { closed = true; clearInterval(hb); if (chosen != null) out(chosen, { k: 'bye' }); brokers.forEach(function (m) { m.close(); }); },
+      isOpen: function () { return chosen != null; },
+      poke: function () {
+        brokers.forEach(function (m, i) { if (!m.ws && !m.closed) m.connect(); else if (m.ready && chosen == null) sendOpen(i); });
+        if (chosen != null) out(chosen, { k: 'ping' });
+      }
+    };
+  };
+
+  // ---------- Проверка связи ----------
+  Net.diagnose = function (onResult) {
+    Net.BROKERS.forEach(function (url, i) {
+      var t0 = performance.now(), done = false;
+      var m = new Mqtt(url, function () {}, function (s) {
+        if (done) return; done = true;
+        onResult(i, s === 'open' ? Math.round(performance.now() - t0) : -1);
+        m.close();
+      });
+      m.connect();
+      setTimeout(function () { if (!done) { done = true; onResult(i, -1); m.close(); } }, 10000);
+    });
+    var ctl = window.AbortController ? new AbortController() : null;
+    var t1 = performance.now();
+    setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    fetch('https://0.peerjs.com/peerjs/id?ts=' + Date.now(), ctl ? { signal: ctl.signal } : {})
+      .then(function (r) { onResult('peer', r.ok ? Math.round(performance.now() - t1) : -1); }, function () { onResult('peer', -1); });
+  };
+})();
+
+// ============================================================
 //  Хост: лобби, таймеры, проверка приказов, дипломатия, сохранение
 // ============================================================
 (function () {
@@ -2011,6 +2231,10 @@ CH.RULES = [
     var me = S.byCid(cid), isHost = cid === S.hostCid;
     var pid = me ? me.pid : null;
     switch (m.t) {
+      case 'sync':
+        var round = S.st ? S.st.round : 0;
+        if (m.phase !== S.phase || (S.st && m.round !== round)) S.send(cid, S.view(cid));
+        break;
       case 'pick': if (S.phase === 'lobby' && me) S.pick(me, m); break;
       case 'opts':
         if (isHost && S.phase === 'lobby') {
@@ -2547,6 +2771,7 @@ CH.RULES = [
       '<button class="btn wood big" id="b-join">🚪 Войти по коду</button>' +
       '<button class="btn ghost" id="b-solo">🤖 Тренировка с ботами</button>' +
       '<div class="row"><button class="btn ghost small sp" id="b-lore">📜 Летопись</button><button class="btn ghost small sp" id="b-rules">📖 Правила</button></div>' +
+      '<button class="btn ghost small" id="b-diag">🔧 Проверка связи</button>' +
       '<div class="titlefoot"><button class="btn tiny ghost" id="b-sfx">Звук: ' + (A.sfxOn ? 'вкл' : 'выкл') + '</button><button class="btn tiny ghost" id="b-mus">Музыка: ' + (A.musicOn ? 'вкл' : 'выкл') + '</button></div>' +
       '</div></div>';
     function nick() {
@@ -2561,9 +2786,22 @@ CH.RULES = [
     if (save) $('#b-cont').onclick = function () { gesture(); if (nick()) { fs(); App.createHost(false, save); } };
     $('#b-lore').onclick = function () { gesture(); showLore(); };
     $('#b-rules').onclick = function () { gesture(); showRules(); };
+    $('#b-diag').onclick = function () { gesture(); showDiag(); };
     $('#b-sfx').onclick = function () { A.init(); A.setSfx(!A.sfxOn); this.textContent = 'Звук: ' + (A.sfxOn ? 'вкл' : 'выкл'); A.play('click'); };
     $('#b-mus').onclick = function () { A.init(); A.setMusic(!A.musicOn); this.textContent = 'Музыка: ' + (A.musicOn ? 'вкл' : 'выкл'); };
   };
+
+  function showDiag() {
+    var names = CH.Net.BROKER_NAMES;
+    var rows = CH.Net.BROKERS.map(function (u, i) { return '<div class="row small"><span class="sp">Сервер связи ' + (i + 1) + ' (' + esc(names[i] || u) + ')</span><b id="dg' + i + '">проверяю…</b></div>'; }).join('') +
+      '<div class="row small"><span class="sp">PeerJS (старый способ)</span><b id="dgpeer">проверяю…</b></div>';
+    var ov = modal('<h2>Проверка связи</h2><div class="small muted">Игре нужен хотя бы один зелёный сервер — один и тот же у хоста и у друзей. Если всё красное, попробуй другой интернет (Wi‑Fi ↔ мобильный).</div><div style="margin-top:8px">' + rows + '</div>' +
+      '<div class="small muted" style="margin-top:8px">Режим связи: ' + CH.Net.mode + '</div>');
+    CH.Net.diagnose(function (i, ms) {
+      var el = $('#dg' + i, ov); if (!el) return;
+      el.textContent = ms >= 0 ? '✔ ' + ms + ' мс' : '✘ недоступен'; el.style.color = ms >= 0 ? '#62a544' : '#ff5b4a';
+    });
+  }
 
   App.showJoin = function (code) {
     var ov = modal('<h2>Войти в комнату</h2><div class="small muted">Код из четырёх латинских букв. Спроси у хоста — он не укусит. Наверное.</div>' +
@@ -2616,7 +2854,10 @@ CH.RULES = [
       onOpen: function () { App.connected = true; App.conn.send({ t: 'hello', cid: App.cid, nick: App.nick }); updateConn(); },
       onMessage: App.onMessage,
       onClose: function () { App.connected = false; updateConn(); toast('Связь с хостом потеряна. Переподключаюсь…'); },
-      onStatus: function (s) { var el = $('#jst'); if (el) el.textContent = s; else if (App.screen !== 'title') toast(s); }
+      onStatus: function (s) {
+        var el = $('#jst'); if (el) { el.textContent = s; return; }
+        var now = Date.now(); if (App.screen !== 'title' && (s !== App._lastSt || now - App._lastStT > 12000)) { App._lastSt = s; App._lastStT = now; toast(s); }
+      }
     });
     setTimeout(function () { var m = $('#modal-root .modal'); if (m && !App.connected) m.insertAdjacentHTML('beforeend', '<div id="jst" class="small muted"></div><button class="btn small ghost" onclick="location.href=location.pathname">Отмена</button>'); }, 4000);
   };
@@ -3306,6 +3547,10 @@ CH.RULES = [
   window.addEventListener('beforeunload', function (e) {
     if (App.isHost && App.server && App.server.phase !== 'lobby' && App.server.phase !== 'over' && !App.leaving && !App.server.noSave) { e.preventDefault(); e.returnValue = ''; }
   });
+  setInterval(function () {
+    if (!App.conn || App.isHost) return;
+    if (App.screen === 'game' || App.screen === 'lobby') App.send({ t: 'sync', phase: App.screen === 'lobby' ? 'lobby' : App.phase, round: App.st ? App.st.round : 0 });
+  }, 6000);
   document.addEventListener('pointerdown', function () { A.init(); }, { once: true });
   window.addEventListener('DOMContentLoaded', function () {
     $('#rotate-ok').onclick = function () { document.body.classList.add('portrait-ok'); setTimeout(M.fit, 100); };
