@@ -1884,11 +1884,19 @@ CH.RULES = [
       if (closed) return;
       loadPeer().then(function () {
         if (!peer || peer.destroyed) {
-          peer = new Peer(PEER_OPTS);
+          // свой ID задаём сами: так не нужен запрос /peerjs/id, который у некоторых провайдеров падает с server-error
+          peer = new Peer(PREFIX + 'u' + Math.random().toString(36).slice(2, 12), PEER_OPTS);
           peer.on('open', openConn);
           peer.on('error', function (e) {
             if (e.type === 'peer-unavailable') { notFound++; h.onStatus && h.onStatus(notFound > 2 ? 'Комната не найдена. Проверь код или жди, пока хост вернётся…' : 'Ищу комнату…'); schedule(3000); }
-            else { h.onStatus && h.onStatus('Сеть: ' + e.type); if (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error') { try { peer.destroy(); } catch (x) {} } schedule(3000); }
+            else {
+              var why = { 'network': 'нет связи с сервером знакомств', 'server-error': 'сервер знакомств не ответил',
+                          'socket-error': 'обрыв связи с сервером знакомств', 'unavailable-id': 'ID занят, беру другой',
+                          'browser-incompatible': 'браузер не поддерживает WebRTC — попробуй Chrome или Safari' }[e.type] || e.type;
+              h.onStatus && h.onStatus('Сеть: ' + why + '. Пробую ещё раз…');
+              if (e.type !== 'peer-unavailable') { try { peer.destroy(); } catch (x) {} }
+              schedule(3000);
+            }
           });
           peer.on('disconnected', function () { setTimeout(function () { try { if (!peer.destroyed) peer.reconnect(); } catch (x) {} }, 1000); });
         } else if (peer.open) openConn();
