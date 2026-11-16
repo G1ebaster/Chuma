@@ -12,18 +12,15 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#17110d; --bg2:#231a13; --wood:#3b2a1c; --wood2:#5c3a1a; --wood3:#8a5a2b;
   --parch:#efe2bf; --parch2:#d8c596; --ink:#1a1410; --red:#a3271c; --red2:#d0412f; --gold:#f1c40f; --gold2:#b8860b;
   --green:#3f7d2c; --green2:#62a544; --muted:#a8977a; --blood:#7d1f16;
-  --font:'Pixelify Sans','Courier New',monospace;
+  --font:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--parch);font-family:var(--font);font-size:13px;
+html,body{height:100%;margin:0;background:var(--bg);color:var(--parch);font-family:var(--font);font-size:14px;line-height:1.3;
   overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 input,textarea,select{-webkit-user-select:text;user-select:text}
 #app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -31,7 +28,7 @@ img.spr,canvas{image-rendering:pixelated;image-rendering:crisp-edges}
 img.spr{vertical-align:middle;pointer-events:none}
 b{font-weight:700}
 .muted{color:var(--muted)}
-.small{font-size:11px}
+.small{font-size:12.5px}
 .hidden{display:none!important}
 
 /* ---------- кнопки ---------- */
@@ -44,8 +41,8 @@ b{font-weight:700}
 .btn.green{background:var(--green)}
 .btn.wood{background:var(--wood2)}
 .btn.ghost{background:#2b2119}
-.btn.small{font-size:12px;padding:4px 8px}
-.btn.tiny{font-size:11px;padding:2px 6px;margin:1px}
+.btn.small{font-size:13px;padding:5px 9px}
+.btn.tiny{font-size:12.5px;padding:3px 7px;margin:1px;min-width:24px}
 .btn.big{font-size:18px;padding:12px 22px}
 .btn.on{background:var(--green2);color:var(--ink);text-shadow:none}
 .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -65,10 +62,10 @@ textarea{resize:none;height:60px}
 /* ---------- титул ---------- */
 #title{height:100%;display:flex;align-items:center;justify-content:center;gap:24px;padding:12px;
   background:radial-gradient(ellipse at 50% 30%,#3a2416 0%,#17110d 70%)}
-.logo{font-size:clamp(24px,5.2vw,48px);line-height:1;color:var(--red2);text-shadow:3px 3px 0 var(--ink),-1px -1px 0 #ffb19c;letter-spacing:1px;text-align:center}
-.logo small{display:block;font-size:.38em;color:var(--parch2);text-shadow:2px 2px 0 var(--ink);margin-top:8px;letter-spacing:0}
+.logo{font-size:clamp(24px,5.2vw,48px);line-height:1;font-weight:900;color:var(--red2);text-shadow:3px 3px 0 var(--ink);letter-spacing:1px;text-align:center}
+.logo small{display:block;font-size:.3em;font-weight:400;color:var(--parch2);text-shadow:2px 2px 0 var(--ink);margin-top:8px;letter-spacing:0}
 .title-heroes{display:flex;justify-content:center;gap:10px;margin:14px 0 4px}
-.title-heroes .ph{display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--parch2)}
+.title-heroes .ph{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--parch2)}
 .title-menu{display:flex;flex-direction:column;min-width:240px;max-width:300px}
 .title-menu .btn{width:100%}
 .nickrow{margin-bottom:8px}
@@ -89,8 +86,8 @@ img.portrait{box-shadow:0 0 0 2px var(--ink);background:#3a2a1c}
 .hcard.mine{box-shadow:0 0 0 2px var(--ink),inset 0 0 0 3px var(--gold)}
 .hcard.taken{opacity:.55}
 .hcard .hn{font-size:14px;font-weight:700}
-.hcard .ht{font-size:10px;color:var(--muted)}
-.hcard .tk{position:absolute;right:4px;top:3px;font-size:10px;color:var(--gold)}
+.hcard .ht{font-size:11.5px;color:var(--muted)}
+.hcard .tk{position:absolute;right:4px;top:3px;font-size:11px;color:var(--gold)}
 .sw{display:inline-block;width:12px;height:12px;box-shadow:0 0 0 2px var(--ink);vertical-align:middle}
 .emblem{display:inline-flex;align-items:center;justify-content:center;width:24px;height:26px;box-shadow:0 0 0 2px var(--ink);
   clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);vertical-align:middle}
@@ -98,45 +95,78 @@ select{font-family:var(--font);font-size:13px;background:#fff8e3;border:0;paddin
 
 /* ---------- игра ---------- */
 #game{height:100%;display:flex;flex-direction:column}
-#topbar{height:34px;display:flex;align-items:center;gap:8px;padding:0 6px;background:var(--wood);box-shadow:0 2px 0 var(--ink);z-index:2;white-space:nowrap;overflow:hidden}
-#topbar .tb{display:flex;align-items:center;gap:3px;font-size:14px}
-#topbar .btn{margin:0 1px;padding:4px 8px;font-size:12px}
+#topbar{height:36px;display:flex;align-items:center;gap:8px;padding:0 6px;background:var(--wood);box-shadow:0 2px 0 var(--ink);z-index:2;white-space:nowrap;overflow:hidden}
+#topbar .tb{display:flex;align-items:center;gap:3px;font-size:15px;font-weight:700}
+#topbar .net{font-size:12px;font-weight:400;color:var(--green2)}
+#topbar .net.neg{color:#ff5b4a}
+#topbar .btn{margin:0 1px;padding:5px 9px;font-size:13px}
 #tb-timer{min-width:46px;color:var(--gold);font-size:16px!important}
 #tb-timer.hot{color:#ff5b4a;animation:pulse .5s infinite alternate}
 @keyframes pulse{to{transform:scale(1.15)}}
 #main{flex:1;display:flex;min-height:0}
 #mapwrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#1e3d5e;overflow:hidden;min-width:0}
-#map{display:block;cursor:pointer;touch-action:manipulation}
-#maphint{position:absolute;left:6px;bottom:6px;right:6px;pointer-events:none;text-align:center;font-size:12px;color:#fff;text-shadow:1px 1px 0 #000,-1px -1px 0 #000}
-#phasebadge{position:absolute;left:6px;top:6px;pointer-events:none;font-size:12px;background:rgba(0,0,0,.55);padding:3px 6px}
-#panel{width:min(36vw,270px);min-width:200px;display:flex;flex-direction:column;background:var(--bg2);box-shadow:-2px 0 0 var(--ink),inset 2px 0 0 var(--wood2)}
+#mapscroll{position:absolute;left:0;top:0;right:0;bottom:0;overflow:auto;display:flex;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#mapscroll::-webkit-scrollbar{display:none}
+#mapbox{position:relative;flex:none;margin:auto}
+#zoom{position:absolute;right:4px;top:4px;display:flex;flex-direction:column;z-index:2}
+#zoom .btn{margin:2px;width:34px;height:32px;padding:0;font-size:18px;line-height:1;opacity:.9}
+#map{display:block;width:100%;height:100%;cursor:pointer;touch-action:manipulation}
+#mapfx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#maphint{position:absolute;left:6px;bottom:4px;right:6px;pointer-events:none;text-align:center;font-size:13px;font-weight:600;color:#fff;text-shadow:1px 1px 0 #000,-1px -1px 0 #000}
+#phasebadge{position:absolute;left:6px;top:4px;pointer-events:none;font-size:12.5px;background:rgba(0,0,0,.55);padding:3px 6px}
+#panel{width:min(36vw,300px);min-width:210px;display:flex;flex-direction:column;background:var(--bg2);box-shadow:-2px 0 0 var(--ink),inset 2px 0 0 var(--wood2)}
 #panel-body{flex:1;overflow-y:auto;padding:8px;-webkit-overflow-scrolling:touch}
 #panel-foot{padding:6px;box-shadow:0 -2px 0 var(--ink)}
 #panel-foot .btn{width:100%;margin:0;font-size:16px;padding:10px}
-.pt{font-size:15px;font-weight:700;margin-bottom:2px}
-.sub{font-size:11px;color:var(--muted);margin-bottom:6px}
-.sec{margin:8px 0 4px;font-size:12px;color:var(--gold);border-bottom:1px solid var(--wood2);padding-bottom:2px}
+.pt{font-size:16px;font-weight:700;margin-bottom:2px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.sec{margin:9px 0 4px;font-size:13px;font-weight:700;color:var(--gold);border-bottom:1px solid var(--wood2);padding-bottom:2px}
 .army{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0}
-.u{display:inline-flex;align-items:center;gap:1px;background:#00000040;padding:1px 3px 1px 1px;font-size:12px}
+.u{display:inline-flex;align-items:center;gap:3px;background:#0000004d;padding:2px 5px 2px 2px;font-size:13.5px;border-left:4px solid #888;cursor:pointer}
+.u small.lost{color:#ff7a6a;font-size:12px}
+.c-inf{border-color:#d98f45!important}.c-ranged{border-color:#5cc24a!important}.c-cav{border-color:#4aa3ff!important}.c-siege{border-color:#ff6a4a!important}
 .owner{display:inline-flex;align-items:center;gap:4px}
 .move{background:#0003;padding:4px;margin:4px 0;box-shadow:inset 0 0 0 1px var(--wood2)}
 .move.focus{box-shadow:inset 0 0 0 2px var(--gold)}
-.mvh{display:flex;align-items:center;gap:4px;font-size:12px}
-.step{display:inline-flex;align-items:center;gap:1px;margin:2px 4px 2px 0}
+.mvh{display:flex;align-items:center;gap:4px;font-size:13px}
+.step{display:inline-flex;align-items:center;gap:1px;margin:2px 4px 2px 0;border-left:4px solid #888;padding-left:2px}
 .step b{min-width:18px;text-align:center}
-.rec{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.ru{font-family:var(--font);background:#3b2a1c;color:var(--parch);border:0;box-shadow:0 0 0 2px var(--ink),inset 0 0 0 1px var(--wood3);
-  padding:3px 0;display:flex;flex-direction:column;align-items:center;font-size:11px;position:relative;cursor:pointer}
-.ru:disabled{opacity:.4}
-.ru .q{position:absolute;right:1px;top:0;color:var(--gold);font-weight:700}
-.queue{font-size:12px;margin-top:4px}
+.rec{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ru{display:flex;background:#33251a;box-shadow:0 0 0 2px var(--ink);border-left:5px solid #888;position:relative}
+.ru.dis{opacity:.45}
+.ru-main{flex:1;min-width:0;font-family:var(--font);background:none;border:0;color:var(--parch);display:flex;align-items:center;gap:5px;padding:4px 2px 4px 4px;text-align:left;cursor:pointer}
+.ru-t{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.ru-t b{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ru-t span{font-size:12px;color:var(--gold)}
+.ru-t small{font-size:11px;color:var(--muted);white-space:nowrap}
+.ru .q{position:absolute;left:24px;top:-5px;background:var(--gold);color:var(--ink);font-weight:700;font-size:12px;padding:0 5px;box-shadow:0 0 0 1px var(--ink)}
+.ru-i{font-family:var(--font);width:19px;border:0;background:#0006;color:var(--parch2);font-size:12px;font-weight:700;font-style:italic;cursor:pointer;padding:0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:4px;box-shadow:0 0 0 1px var(--ink)}
+.bld{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px dashed var(--wood2);font-size:13px}
+.bld small{color:var(--muted);font-size:12px}
+.bld .bic{width:34px;display:flex;justify-content:center;flex:none}
+.bld .btn{margin:0;white-space:nowrap}
+.bld.built{opacity:.8}
+.good{color:var(--green2)} .bad{color:#ff7a6a}
+table.money{width:100%;border-collapse:collapse;font-size:13px}
+table.money td{padding:1px 0} table.money td:last-child{text-align:right;font-weight:700;white-space:nowrap}
+table.money tr.tot td{border-top:1px solid var(--wood2);border-bottom:1px solid var(--wood2)}
+.statbar{display:flex;align-items:center;gap:6px;font-size:12.5px;margin-top:3px}
+.statbar span{width:86px;flex:none} .statbar i{flex:1;height:8px;background:#0006;box-shadow:0 0 0 1px var(--ink);display:block;max-width:160px} .statbar em{display:block;height:100%} .statbar b{width:18px;text-align:right}
+.ubig{display:inline-flex;padding:6px;background:#0005;border-left:6px solid #888;flex:none}
+.ctag{display:inline-block;padding:1px 7px;color:var(--ink);font-size:12px;font-weight:700}
+.ucard{border-left:6px solid #888;background:#0003;padding:8px;margin:6px 0}
+.ucard .ubig{border-left:0}
+.bs{margin:3px 0 0;font-size:13px} .bs .army{display:inline-flex;margin:0 0 0 6px;vertical-align:middle}
+.queue{font-size:13px;margin-top:5px}
 .queue .qi{display:flex;align-items:center;gap:4px}
 .hero-mini{display:flex;gap:8px;align-items:center}
 .abil{width:100%;text-align:left}
-.quest{font-size:11px;margin:2px 0}
+.quest{font-size:12.5px;margin:3px 0}
 .quest.done{color:var(--green2);text-decoration:line-through}
-.hint{font-size:11px;color:var(--muted);margin:6px 0;font-style:italic}
-.tag{display:inline-block;font-size:10px;padding:1px 4px;background:var(--wood2);margin-left:3px}
+.hint{font-size:12px;color:var(--muted);margin:6px 0;font-style:italic}
+.tag{display:inline-block;font-size:11px;padding:1px 5px;background:var(--wood2);margin-left:3px}
 .tag.ally{background:var(--green)} .tag.judas{background:var(--blood)} .tag.dead{background:#444}
 
 /* ---------- модалки ---------- */
@@ -144,19 +174,19 @@ select{font-family:var(--font);font-size:13px;background:#fff8e3;border:0;paddin
 .modal{max-width:min(760px,96vw);max-height:94vh;overflow:auto;position:relative;-webkit-overflow-scrolling:touch}
 .modal .x{position:absolute;right:6px;top:6px;z-index:3}
 .modal.wide{width:min(900px,97vw)}
-.drawer{position:fixed;right:0;top:34px;bottom:0;width:min(58vw,520px);z-index:40;overflow:auto;-webkit-overflow-scrolling:touch}
+.drawer{position:fixed;right:0;top:36px;bottom:0;width:min(58vw,520px);z-index:40;overflow:auto;-webkit-overflow-scrolling:touch}
 .ev{background:#3b1d12;box-shadow:inset 0 0 0 2px var(--red);padding:8px;margin:6px 0}
 .ev h3{color:#ffb19c}
-.lines div{margin:3px 0;font-size:12px;line-height:1.3}
-.bt{font-size:12px;margin:3px 0;padding:3px 5px;background:#0003}
+.lines div{margin:4px 0;font-size:13px;line-height:1.3}
+.bt{font-size:13px;margin:5px 0;padding:5px 7px;background:#0003}
 .bt.mine{box-shadow:inset 3px 0 0 var(--gold)}
 .dp{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--wood2)}
-.chat{height:130px;overflow:auto;background:#0004;padding:4px;font-size:12px;margin:6px 0}
+.chat{height:130px;overflow:auto;background:#0004;padding:4px;font-size:13px;margin:6px 0}
 .chat .sys{color:var(--gold)}
 .chips{display:flex;flex-wrap:wrap;gap:2px}
-.chips .btn{font-size:11px;padding:3px 6px;margin:2px}
+.chips .btn{font-size:12.5px;padding:4px 7px;margin:2px}
 .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
-.opt{background:#fff8e3;color:var(--ink);box-shadow:0 0 0 2px var(--ink);padding:6px;cursor:pointer;font-size:12px}
+.opt{background:#fff8e3;color:var(--ink);box-shadow:0 0 0 2px var(--ink);padding:6px;cursor:pointer;font-size:12.5px}
 .opt.sel{background:#ffe48a;box-shadow:0 0 0 3px var(--red)}
 .opt b{font-size:13px}
 .swatches{display:flex;gap:6px;flex-wrap:wrap}
@@ -164,9 +194,10 @@ select{font-family:var(--font);font-size:13px;background:#fff8e3;border:0;paddin
 .swatches span.sel{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ink)}
 .embl span{cursor:pointer;padding:2px}
 .embl span.sel{outline:3px solid var(--red)}
-.utable{width:100%;border-collapse:collapse;font-size:12px}
-.utable td{padding:3px;border-bottom:1px dashed #b8a477;vertical-align:middle}
-.standings td{padding:4px 6px;border-bottom:1px dashed var(--wood2);font-size:12px}
+.utable{width:100%;border-collapse:collapse;font-size:13px}
+.utable td{padding:5px 6px;border-bottom:1px dashed var(--wood2);vertical-align:middle}
+.utable td:first-child{width:44px;text-align:center}
+.standings td{padding:4px 6px;border-bottom:1px dashed var(--wood2);font-size:13px}
 .winbig{font-size:30px;color:var(--gold);text-shadow:3px 3px 0 var(--ink);text-align:center}
 .losebig{font-size:30px;color:var(--red2);text-shadow:3px 3px 0 var(--ink);text-align:center}
 
@@ -209,7 +240,7 @@ select{font-family:var(--font);font-size:13px;background:#fff8e3;border:0;paddin
 var CH = (typeof globalThis !== 'undefined' ? globalThis : window).CH || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).CH = CH;
 
-CH.VERSION = '1.0';
+CH.VERSION = '2.0';
 
 // ---------- Местность ----------
 CH.TERRAIN = {
@@ -219,10 +250,10 @@ CH.TERRAIN = {
   swamp:     { name: 'Болото',    income: 0, glory: 0, def: 0,    pass: true,  desc: 'Все сражаются на 25% хуже. Дохода нет, только комары.' },
   village:   { name: 'Деревня',   income: 2, glory: 0, def: 0,    pass: true,  desc: '+2 золота. Крестьяне платят подати и молятся, чтобы их не заметили.' },
   monastery: { name: 'Монастырь', income: 1, glory: 1, def: 0.1,  pass: true,  desc: '+1 золото, +1 слава за раунд. Монахи молятся за того, кто платит.' },
-  city:      { name: 'Город',     income: 3, glory: 1, def: 0,    pass: true,  walls: 1, recruit: 3, desc: '+3 золота, +1 слава. Можно нанимать войска (до 3 за раунд). Стены.' },
-  capital:   { name: 'Столица',   income: 5, glory: 2, def: 0,    pass: true,  walls: 2, recruit: 5, desc: '+5 золота, +2 славы. Найм до 5 войск за раунд. Крепкие стены.' },
+  city:      { name: 'Город',     income: 3, glory: 1, def: 0,    pass: true,  walls: 1, recruit: 3, desc: '+3 золота, +1 слава. Найм до 3 войск за раунд. Можно строить рынок, казармы, собор.' },
+  capital:   { name: 'Столица',   income: 5, glory: 2, def: 0,    pass: true,  walls: 2, recruit: 5, desc: '+5 золота, +2 славы. Найм до 5 войск за раунд. Можно строить рынок, казармы, собор.' },
   mountain:  { name: 'Горы',      income: 0, glory: 0, def: 0,    pass: false, desc: 'Непроходимо. Там живут козлы и отшельники. Часто это одно и то же.' },
-  water:     { name: 'Вода',      income: 0, glory: 0, def: 0,    pass: false, desc: 'Непроходимо. Флот ещё не изобрели. Точнее, изобрели, но не вам.' }
+  water:     { name: 'Море',      income: 0, glory: 0, def: 0,    pass: false, sea: true, desc: 'Выйти в море можно из провинции с Портом. На воде все бьются на 25% хуже: морская болезнь. Высадка — на любой берег.' }
 };
 
 // ---------- Юниты ----------
@@ -253,15 +284,67 @@ CH.UNITS = {
 };
 CH.BASE_UNITS = ['militia', 'spear', 'archer', 'knight', 'bombard', 'trebuchet'];
 CH.UNIQUE_UNITS = ['genoese', 'horsearch', 'ushkuy', 'ordknight'];
-CH.WALL_COST = 8;
+CH.ROUND_OPTS = [10, 12, 15, 20, 25, 30];
+CH.TIME_OPTS = [40, 50, 60, 75, 90, 120];           // секунд на приказы в 1-м раунде; к последнему — вдвое больше
+CH.roundTime = function (base, round, maxRounds) {
+  var k = maxRounds > 1 ? (Math.min(round, maxRounds) - 1) / (maxRounds - 1) : 0;
+  return Math.round(base * (1 + k) / 5) * 5;
+};
 CH.MAX_WALLS = 3;
+CH.FORT_COST = [4, 7, 10];                       // цена уровня 1, 2, 3
+CH.FORT_NAMES = ['нет', 'Частокол', 'Форт', 'Замок'];
+CH.FORT_DEF = 0.2;                               // −20% урона защитникам за уровень
+CH.START_GOLD = 15;
+CH.UPKEEP_PER = 3;                               // 1 золото жалованья за каждых 3 воинов (ополчение бесплатно)
+
+// ---------- Классы войск (для интерфейса) ----------
+CH.CLASSES = {
+  inf:    { name: 'Пехота',  color: '#d98f45', beats: 'держит строй' },
+  ranged: { name: 'Стрелки', color: '#5cc24a', beats: 'бьют пехоту' },
+  cav:    { name: 'Конница', color: '#4aa3ff', beats: 'бьёт стрелков и осадные' },
+  siege:  { name: 'Осадные', color: '#ff6a4a', beats: 'ломают укрепления' }
+};
+CH.UNIT_UI = {
+  militia:   { cls: 'inf',    short: 'Ополчение', strong: 'дёшево и служит без жалованья', weak: 'проигрывает всем, кроме другого ополчения' },
+  spear:     { cls: 'inf',    short: 'Копья',     strong: 'бьют конницу ×2.5', weak: 'страдают от стрелков' },
+  archer:    { cls: 'ranged', short: 'Лучники',   strong: 'стреляют до рукопашной, по пехоте ×1.5', weak: 'конница топчет их ×2' },
+  knight:    { cls: 'cav',    short: 'Рыцари',    strong: 'топчут стрелков и осадные ×2', weak: 'копейщики бьют их ×2.5' },
+  bombard:   { cls: 'siege',  short: 'Бомбарда',  strong: 'снимает уровень укреплений, по гарнизону за стенами ×2', weak: 'конница бьёт ×2, может взорваться' },
+  trebuchet: { cls: 'siege',  short: 'Требушет',  strong: 'снимает уровень укреплений, заражает чумой', weak: 'конница бьёт ×2' },
+  genoese:   { cls: 'ranged', short: 'Генуэзцы',  strong: 'мощный залп, по коннице ×1.5', weak: 'в рукопашной слабы' },
+  horsearch: { cls: 'cav',    short: 'Кон. лучн.', strong: 'конница с залпом, по пехоте ×1.3', weak: 'копейщики бьют их ×2.5' },
+  ushkuy:    { cls: 'inf',    short: 'Ушкуйники', strong: 'крепкая пехота, золото за каждую победу', weak: 'страдают от стрелков' },
+  ordknight: { cls: 'cav',    short: 'Орден',     strong: 'сильнейшие в рукопашной, стрелков и осадные ×2', weak: 'копейщики бьют их ×2.5, дороги' }
+};
+
+// ---------- Строения ----------
+// on — на какой местности можно строить; gold/glory — прибавка за раунд; slots — места найма
+CH.BUILDINGS = {
+  mill:      { name: 'Мельница',  cost: 5,  on: ['plain', 'village'], gold: 1,
+               desc: '+1 золото. Мельник богатеет, крестьяне худеют — баланс.' },
+  sawmill:   { name: 'Лесопилка', cost: 5,  on: ['forest'], gold: 1,
+               desc: '+1 золото. Лес рубят — щепки летят. Иногда пальцы.' },
+  mine:      { name: 'Рудник',    cost: 8,  on: ['hills'], gold: 2,
+               desc: '+2 золота. Шахтёры работают за еду. Еду обещали подвезти.' },
+  brewery:   { name: 'Пивоварня', cost: 8,  on: ['monastery'], gold: 2,
+               desc: '+2 золота. Монахи варят пиво исключительно для богослужений. Служат часто.' },
+  market:    { name: 'Рынок',     cost: 10, on: ['city', 'capital'], gold: 3,
+               desc: '+3 золота. Торгуют всем: репой, мощами святых, соседями.' },
+  barracks:  { name: 'Казармы',   cost: 8,  on: ['city', 'capital'], slots: 2,
+               desc: '+2 места найма за раунд. Кормят плохо, зато бьют регулярно.' },
+  cathedral: { name: 'Собор',     cost: 14, on: ['city', 'capital'], glory: 1,
+               desc: '+1 слава за раунд. Строили двести лет, вам хватит одного раунда и мешка золота.' },
+  port:      { name: 'Порт',      cost: 6,  on: ['coast'], gold: 1,
+               desc: '+1 золото и выход в море: войска отсюда могут уплыть. Рыба, контрабанда, крысы.' }
+};
+CH.BUILDING_IDS = Object.keys(CH.BUILDINGS);
 
 // ---------- Способности ----------
 CH.PASSIVES = {
-  usury:      { name: 'Ростовщик',     desc: '+20% дохода. Деньги не пахнут. Пахнут те, кто не вернул долг.' },
-  horde:      { name: 'Орда',          desc: 'Конница дешевле на 1 и бьёт на 20% сильнее.' },
-  motherland: { name: 'Глубокий снег', desc: 'В своих провинциях враг наносит на 25% меньше урона, деревни дают +1 золото. Генерал Мороз тоже на зарплате.' },
-  ordnung:    { name: 'Орднунг',       desc: 'Стены за полцены. +1 слава за каждый монастырь каждый раунд.' },
+  usury:      { name: 'Ростовщик',     desc: '+15% дохода. Деньги не пахнут. Пахнут те, кто не вернул долг.' },
+  horde:      { name: 'Орда',          desc: 'Конница дешевле на 1, бьёт на 25% сильнее и не просит жалованья: кормится в походе, за чужой счёт.' },
+  motherland: { name: 'Глубокий снег', desc: 'В своих провинциях враг наносит на 25% меньше урона. Генерал Мороз тоже на зарплате.' },
+  ordnung:    { name: 'Орднунг',       desc: 'Укрепления за полцены. +1 слава за каждый монастырь и каждую столицу каждый раунд.' },
   pious:      { name: 'Святоша',       desc: '+1 слава каждый раунд. Бог всё видит, но смотрит в другую сторону.' },
   butcher:    { name: 'Палач',         desc: '+1 слава за каждую выигранную битву. Публичные казни поднимают рейтинг.' },
   miser:      { name: 'Скупердяй',     desc: 'Найм ополчения даёт двоих по цене одного. Крестьян много, ценность их — соответствующая.' }
@@ -320,14 +403,16 @@ CH.EMBLEMS = ['skull', 'crown', 'sword', 'axe', 'moon', 'star', 'cross', 'coin',
 // ---------- Тайные задания ----------
 CH.QUESTS = {
   monk:     { name: 'Святой отец',      desc: 'Владеть 2 монастырями одновременно.' },
-  banker:   { name: 'Казначей',         desc: 'Накопить 40 золота в казне.' },
+  banker:   { name: 'Казначей',         desc: 'Накопить 50 золота в казне.' },
   butcher:  { name: 'Мясник',           desc: 'Уничтожить 30 вражеских воинов (нейтралы считаются).' },
   judas:    { name: 'Тридцать сребреников', desc: 'Предать союзника.' },
-  king:     { name: 'Царь горы',        desc: 'Владеть 12 провинциями.' },
+  king:     { name: 'Царь горы',        desc: 'Владеть 14 провинциями.' },
   david:    { name: 'Давид и Голиаф',   desc: 'Победить армию, которая была вдвое сильнее твоей.' },
   regicide: { name: 'Цареубийца',       desc: 'Захватить чужую столицу.' },
   peasant:  { name: 'Крестьянский царь', desc: 'Иметь 20 ополченцев одновременно.' },
-  siege:    { name: 'Осадных дел мастер', desc: 'Захватить провинцию со стенами.' },
+  siege:    { name: 'Осадных дел мастер', desc: 'Захватить провинцию с укреплениями.' },
+  builder:  { name: 'Прораб',           desc: 'Построить 5 строений (укрепления считаются).' },
+  admiral:  { name: 'Адмирал',          desc: 'Выиграть бой, высадившись с моря.' },
   plague:   { name: 'Чумной доктор',    desc: 'Чтобы чума одновременно была в 3 провинциях соперников.' }
 };
 CH.QUEST_REWARD = 4;
@@ -379,6 +464,8 @@ CH.EVENTS = {
   poll:     { name: 'Подушная подать', text: 'Крестьян пересчитали по головам. Некоторых — по частям. +1 золото за каждых 3 ополченцев.' },
   wedding:  { name: 'Королевская свадьба', text: 'Кто-то на ком-то женился. Невеста в слезах, жених в долгах, гостям +2 золота за каждый свой город.' }
 };
+CH.EVENTS.storm = { name: 'Шторм', text: 'На море буря. Те, кто не умел плавать, научились. Ненадолго. Армии в море теряют треть.' };
+CH.EVENTS.fire = { name: 'Пожар', text: 'Кто-то уснул со свечой. Точнее, с факелом. Точнее, это был поджог. Одно строение сгорело.' };
 CH.EVENT_IDS = Object.keys(CH.EVENTS);
 
 // ---------- Юмор ----------
@@ -418,6 +505,15 @@ CH.FLAVOR = {
   poison: ['Армия в «{prov}» выпила за здоровье. В бокале было вино и кое-что ещё. Потери: {n}.'],
   plaguegift: ['{p} отправил в «{prov}» подарок: мешок чумных крыс с бантиком.'],
   bribe: ['{p} купил «{prov}». Гарнизон ушёл на пенсию. Навсегда, в канаву.'],
+  desert: ['{p}: казна пуста, жалованье не выплачено. Дезертировало воинов: {n}. Ушли к тому, кто платит.',
+           '{p} задолжал войску. Воины ({n}) обиделись и ушли в разбойники. Карьерный рост.'],
+  loot: ['{a} разграбил «{prov}»: +{n} зол. Вынесли всё, включая двери.',
+         '{a}: добыча из «{prov}» — {n} зол. и чья-то бабушка. Бабушку вернули.'],
+  treasury: ['Казна разграблена: {a} унёс {n} зол. {v} пересчитывает пуговицы.'],
+  landing: ['{p} высадился с моря в «{prov}». Половину укачало, остальные злые.',
+            '{p}: десант в «{prov}»! С кораблей сошли воины и запах рыбы.'],
+  exile: ['{v} остался без войска и без города, где его нанять. Вассалы разбежались, {v} выбывает. Земли стали ничьими.',
+          '{v}: ни солдат, ни казарм. Король без армии — это просто мужик в смешной шапке. Выбывает.'],
   execution: ['{p} устроил показательную казнь. Толпа рукоплещет, слава растёт, ополчение нервничает.']
 };
 
@@ -440,13 +536,18 @@ CH.LORE = [
 
 CH.RULES = [
   ['Цель', 'Набрать больше всех <b>славы</b> к последнему раунду — или досрочно захватить <b>все столицы</b> (вместе с союзниками), или остаться последним живым. Если победитель в союзе — союзник побеждает вместе с ним.'],
-  ['Раунд', 'Все отдают приказы <b>одновременно</b>, пока идёт таймер. Потом приказы исполняются разом: войска идут, сталкиваются, бьются. Нажми <b>«Готов»</b>, чтобы не ждать таймер.'],
-  ['Приказы', 'Тапни свою провинцию с войском, затем соседнюю — войска пойдут туда (можно выбрать, сколько и кого). В <b>городе</b> и <b>столице</b> можно нанимать войска и строить стены. Нанятые появятся в конце раунда.'],
-  ['Бой', 'Если в провинции оказались враги — бой до победного. Сначала стреляют стрелки и артиллерия, затем все рубятся. Копья бьют конницу, конница — стрелков и пушки, стрелки — пехоту. Защитнику помогают лес, холмы и стены. Стены ломает артиллерия.'],
-  ['Деньги и слава', 'Каждый раунд провинции дают золото, а города, монастыри и столицы — славу. Ещё слава за победы в битвах (+1, против вдвое сильного +2), взятие чужой столицы (+5) и тайные задания (+4).'],
+  ['Раунд', 'Все отдают приказы <b>одновременно</b>, пока идёт таймер. Потом приказы исполняются разом: войска идут, сталкиваются, бьются. Чем дальше игра, тем больше времени на раунд. Нажми <b>«Готов»</b>, чтобы не ждать таймер.'],
+  ['Приказы', 'Тапни свою провинцию с войском, затем соседнюю — войска пойдут туда (можно выбрать, сколько и кого). В <b>городе</b> и <b>столице</b> можно нанимать войска. Нанятые и построенное появятся в конце раунда.'],
+  ['Бой', 'Если в провинции оказались враги — бой до победного. Сначала стреляют стрелки и осадные, затем все рубятся. <b>Копья бьют конницу, конница — стрелков и осадные, стрелки — пехоту.</b> Защитнику помогают лес, холмы и укрепления.'],
+  ['Строения', 'На своих землях можно строить за золото: <b>мельницу</b> (поле, деревня), <b>лесопилку</b> (лес), <b>рудник</b> (холмы), <b>пивоварню</b> (монастырь), в городах и столице — <b>рынок</b>, <b>казармы</b>, <b>собор</b>, на берегу — <b>порт</b>. Захватил чужое — строения достаются тебе.'],
+  ['Укрепления', 'Любую свою провинцию можно укрепить: <b>частокол → форт → замок</b> (4, 7 и 10 золота). Каждый уровень снижает урон по защитникам на 20%. Каждая осадная машина врага снимает один уровень на время боя.'],
+  ['Море', 'Построй <b>порт</b> на берегу — и войска из этой провинции смогут выйти в море. По морю плаваешь свободно, высаживаться можно на любой берег. На воде все бьются на 25% хуже, десант в первом бою — тоже.'],
+  ['Деньги', 'Провинции и строения дают золото каждый раунд. Войску нужно <b>жалованье</b>: 1 золото за каждых 3 воинов (ополчение служит бесплатно). Нечем платить — воины дезертируют. Захват чужой провинции приносит <b>добычу</b>, а взятие столицы — половину казны врага.'],
+  ['Слава', 'Города, монастыри, столицы и соборы дают славу каждый раунд. Ещё слава за победы в битвах с игроками (+1, против вдвое сильного +2), взятие чужой столицы (+5) и тайные задания (+4).'],
+  ['Выбывание', 'Претендент выбывает, если у него не осталось войска и нет ни одного города или столицы, где можно нанять новое. Его земли становятся ничьими.'],
   ['Дипломатия', 'Союзы: союзники не дерутся, могут стоять в провинциях друг друга и вместе брать столицы. Можно честно разорвать союз (сработает в конце раунда) или <b>предать</b>: нож в спину сработает в начале боя, +3 славы и +50% атаки против бывшего союзника. Можно дарить золото.'],
   ['Герой', 'У каждого героя пассивка, активная способность (с перезарядкой) и уникальный отряд. Способность выбирается в панели героя и срабатывает в начале исполнения приказов.'],
-  ['Беды', 'Чума: провинция не даёт дохода, армия теряет четверть каждый раунд, зараза ползёт к соседям. Ещё бывают бунты, инквизиция, кометы и прочие радости Средневековья.']
+  ['Беды', 'Чума: провинция не даёт дохода, армия теряет четверть каждый раунд, зараза ползёт к соседям. Ещё бывают бунты, инквизиция, шторма, пожары и прочие радости Средневековья.']
 ];
 
 // ============================================================
@@ -527,15 +628,15 @@ CH.RULES = [
   }
 
   function genMap(n, rng) {
-    var size = n <= 2 ? [9, 6] : n === 3 ? [10, 6] : n === 4 ? [11, 7] : n === 5 ? [12, 8] : n === 6 ? [13, 8] : [14, 9];
+    var size = n <= 2 ? [11, 8] : n === 3 ? [12, 8] : n === 4 ? [14, 9] : n === 5 ? [15, 9] : n === 6 ? [16, 10] : [17, 10];
     var cols = size[0], rows = size[1], N = cols * rows, i, j;
     var adj = []; for (i = 0; i < N; i++) adj.push(neighborsRaw(cols, rows, i));
     var t = [];
-    var W = { plain: 30, forest: 22, hills: 13, swamp: 7, village: 15, mountain: 5, water: 4 };
+    var W = { plain: 30, forest: 22, hills: 13, swamp: 6, village: 15, mountain: 5, water: 3 };
+    function ring(i) { var c = i % cols, r = Math.floor(i / cols); return Math.min(c, r, cols - 1 - c, rows - 1 - r); }
     for (i = 0; i < N; i++) {
-      var c = i % cols, r = Math.floor(i / cols);
-      var edge = c === 0 || r === 0 || c === cols - 1 || r === rows - 1;
-      t[i] = edge && rng() < 0.42 ? 'water' : weighted(rng, W);
+      var rg = ring(i);
+      t[i] = rg === 0 ? 'water' : rg === 1 && rng() < 0.2 ? 'water' : weighted(rng, W);
     }
     // столицы — по эллипсу
     var centers = []; for (i = 0; i < N; i++) centers.push(E.hexCenter(cols, i));
@@ -544,11 +645,10 @@ CH.RULES = [
     var caps = [];
     for (j = 0; j < n; j++) {
       var a = start + j * Math.PI * 2 / n;
-      var tx = cx + Math.cos(a) * mw * 0.36, ty = cy + Math.sin(a) * mh * 0.34;
+      var tx = cx + Math.cos(a) * mw * 0.33, ty = cy + Math.sin(a) * mh * 0.3;
       var best = -1, bd = 1e9;
       for (i = 0; i < N; i++) {
-        var cc = i % cols, rr = Math.floor(i / cols);
-        if (cc === 0 || rr === 0 || cc === cols - 1 || rr === rows - 1) continue;
+        if (ring(i) < 2) continue;
         if (caps.some(function (k) { return hexDist(cols, k, i) < 3; })) continue;
         var dx = centers[i][0] - tx, dy = centers[i][1] - ty, d = dx * dx + dy * dy;
         if (d < bd) { bd = d; best = i; }
@@ -569,7 +669,7 @@ CH.RULES = [
       var cur = a, guard = 0;
       while (cur !== b && guard++ < 100) {
         var nb = adj[cur], best = nb[0], bd = 1e9;
-        nb.forEach(function (m) { var d = hexDist(cols, m, b) + rng() * 0.5; if (d < bd) { bd = d; best = m; } });
+        nb.forEach(function (m) { if (ring(m) === 0) return; var d = hexDist(cols, m, b) + rng() * 0.5; if (d < bd) { bd = d; best = m; } });
         cur = best;
         if (!T[t[cur]].pass) t[cur] = 'plain';
       }
@@ -611,7 +711,8 @@ CH.RULES = [
     // связность
     var seen = {}, q = [caps[0]]; seen[caps[0]] = 1;
     while (q.length) { var x = q.shift(); adj[x].forEach(function (m) { if (!seen[m] && T[t[m]].pass) { seen[m] = 1; q.push(m); } }); }
-    for (i = 0; i < N; i++) if (T[t[i]].pass && !seen[i]) t[i] = 'mountain';
+    for (i = 0; i < N; i++) if (T[t[i]].pass && !seen[i]) t[i] = adj[i].some(function (m) { return t[m] === 'water'; }) ? 'water' : 'mountain';
+    for (i = 0; i < N; i++) if (ring(i) === 0) t[i] = 'water';
     // названия
     var pools = {};
     Object.keys(CH.NAMES).forEach(function (k) { pools[k] = shuffle(rng, CH.NAMES[k].slice()); });
@@ -619,12 +720,12 @@ CH.RULES = [
     var provs = [];
     for (i = 0; i < N; i++) {
       var tt = t[i], name;
-      if (tt === 'capital') name = '';
+      if (tt === 'capital' || !T[tt].pass) name = '';
       else {
         var pool = pools[tt] || pools.plain;
         name = pool.length ? pool.pop() : (T[tt].name + ' №' + (counters[tt] = (counters[tt] || 1) + 1));
       }
-      var p = { id: i, t: tt, name: name, owner: null, walls: T[tt].walls || 0, armies: {}, plague: 0, burned: 0 };
+      var p = { id: i, t: tt, name: name, owner: null, walls: T[tt].walls || 0, b: {}, armies: {}, plague: 0, burned: 0, loot: 0 };
       if (T[tt].pass && tt !== 'capital') p.armies.n = garrison(tt, rng);
       provs.push(p);
     }
@@ -663,12 +764,12 @@ CH.RULES = [
       var army = { militia: 4, spear: 2, archer: 2 }; army[hero.unique] = 1;
       prov.armies = {}; prov.armies[lp.pid] = army;
       var qs = shuffle(rng, questIds.slice()).slice(0, 2).map(function (q) { return { id: q, done: false }; });
-      return { pid: lp.pid, nick: lp.nick || hero.name, bot: !!lp.bot, hero: hero, gold: 12, glory: 0, capital: cap,
+      return { pid: lp.pid, nick: lp.nick || hero.name, bot: !!lp.bot, hero: hero, gold: CH.START_GOLD, glory: 0, capital: cap,
                alive: true, cd: 0, quests: qs, judas: false,
-               stats: { kills: 0, lost: 0, won: 0, caps: 0, peakProvs: 1, betrayals: 0 } };
+               stats: { kills: 0, lost: 0, won: 0, caps: 0, peakProvs: 1, betrayals: 0, built: 0, loot: 0 } };
     });
     var st = {
-      v: 1, seed: seed, rs: rng.seed(), round: 1, maxRounds: opts.rounds || 15, phase: 'orders',
+      v: 2, seed: seed, rs: rng.seed(), round: 1, maxRounds: opts.rounds || 20, phase: 'orders',
       cols: m.cols, rows: m.rows, adj: m.adj, provs: m.provs, capitals: m.caps.slice(),
       players: players, alliances: [], breaks: [], mods: {}, lastEvent: null, winner: null, nStart: n,
       history: []
@@ -696,9 +797,42 @@ CH.RULES = [
     if (st.mods.mercs && type === 'knight') c -= 2;
     return Math.max(1, c);
   };
-  E.wallCost = function (pl) { return pl.hero.passive === 'ordnung' ? CH.WALL_COST / 2 : CH.WALL_COST; };
+  E.isSea = function (st, id) { return !!T[st.provs[id].t].sea; };
+  E.coastal = function (st, id) { return T[st.provs[id].t].pass && st.adj[id].some(function (m) { return T[st.provs[m].t].sea; }); };
+  // Можно ли отдать приказ идти из from в to
+  E.canMove = function (st, pid, from, to) {
+    if (st.adj[from].indexOf(to) < 0) return false;
+    var a = st.provs[from], b = st.provs[to];
+    if (T[b.t].pass) return true;
+    if (!T[b.t].sea) return false;
+    if (T[a.t].sea) return true;
+    return !!(a.b && a.b.port) && a.owner != null && E.allied(st, pid, a.owner);
+  };
+  E.fortCost = function (pl, prov) { var c = CH.FORT_COST[prov.walls] || 0; return pl.hero.passive === 'ordnung' ? Math.ceil(c / 2) : c; };
+  E.buildCost = function (st, pl, prov, b) { return b === 'fort' ? E.fortCost(pl, prov) : CH.BUILDINGS[b].cost; };
+  E.canBuild = function (st, pid, id, b) {
+    var p = st.provs[id]; if (!p || p.owner !== pid || !T[p.t].pass) return false;
+    if (b === 'fort') return p.walls < CH.MAX_WALLS;
+    var B = CH.BUILDINGS[b]; if (!B || (p.b && p.b[b])) return false;
+    if (B.on.indexOf('coast') >= 0) return E.coastal(st, id);
+    return B.on.indexOf(p.t) >= 0;
+  };
+  // Что вообще бывает в этой провинции (и построенное, и доступное)
+  E.buildingsFor = function (st, id) {
+    var p = st.provs[id];
+    return CH.BUILDING_IDS.filter(function (b) { var B = CH.BUILDINGS[b]; return B.on.indexOf('coast') >= 0 ? E.coastal(st, id) : B.on.indexOf(p.t) >= 0; });
+  };
+  E.provIncome = function (st, p, pl) {
+    var v = T[p.t].income; for (var k in p.b) v += CH.BUILDINGS[k].gold || 0;
+    return v;
+  };
+  E.upkeep = function (st, pid) {
+    var u = E.playerUnits(st, pid), n = 0, horde = P(st, pid).hero.passive === 'horde';
+    for (var k in u) if (k !== 'militia' && !(horde && U[k].tags.indexOf('cav') >= 0)) n += u[k];
+    return Math.floor(n / CH.UPKEEP_PER);
+  };
   E.recruitTypes = function (pl) { return CH.BASE_UNITS.concat([pl.hero.unique]); };
-  E.recruitSlots = function (st, id) { return T[st.provs[id].t].recruit || 0; };
+  E.recruitSlots = function (st, id) { var p = st.provs[id], s = T[p.t].recruit || 0; return s ? s + (p.b && p.b.barracks ? CH.BUILDINGS.barracks.slots : 0) : 0; };
   E.armyTotal = function (a) { var s = 0; if (a) for (var k in a) s += a[k]; return s; };
   E.power = function (a) {
     var s = 0; if (!a) return 0;
@@ -708,8 +842,8 @@ CH.RULES = [
   E.ownedProvs = function (st, pid) { return st.provs.filter(function (p) { return p.owner === pid; }); };
   E.income = function (st, pid, ignoreMods) {
     var pl = P(st, pid), inc = 0;
-    st.provs.forEach(function (p) { if (p.owner === pid && !(p.plague > 0) && !p.burned) inc += T[p.t].income + (p.t === 'village' && pl.hero.passive === 'motherland' ? 1 : 0); });
-    if (pl.hero.passive === 'usury') inc = Math.round(inc * 1.2);
+    st.provs.forEach(function (p) { if (p.owner === pid && !(p.plague > 0) && !p.burned) inc += E.provIncome(st, p, pl); });
+    if (pl.hero.passive === 'usury') inc = Math.round(inc * 1.15);
     if (!ignoreMods && st.mods.famine) inc = Math.floor(inc / 2);
     return inc;
   };
@@ -718,7 +852,8 @@ CH.RULES = [
     st.provs.forEach(function (p) {
       if (p.owner !== pid) return;
       g += T[p.t].glory;
-      if (p.t === 'monastery' && pl.hero.passive === 'ordnung') g += 1;
+      if (pl.hero.passive === 'ordnung' && (p.t === 'monastery' || p.t === 'capital')) g += 1;
+      for (var k in p.b) g += CH.BUILDINGS[k].glory || 0;
     });
     if (pl.hero.passive === 'pious') g += 1;
     return g;
@@ -738,7 +873,7 @@ CH.RULES = [
     if (!pl.alive || pl.cd > 0) return out;
     var own = E.ownedProvs(st, pid).map(function (p) { return p.id; });
     st.provs.forEach(function (p) {
-      if (!T[p.t].pass) return;
+      if (!T[p.t].pass && !(ab.target === 'enemyArmy' && T[p.t].sea)) return;
       switch (ab.target) {
         case 'enemyArmy':
           for (var k in p.armies) if (!E.allied(st, pid, k) && E.armyTotal(p.armies[k])) { out.push(p.id); break; }
@@ -827,16 +962,21 @@ CH.RULES = [
       if (!s.def) s.stacks.forEach(function (x) { if (x.type === 'trebuchet') nTreb += x.n; });
     });
     var walls = prov ? prov.walls : 0;
+    if (prov && ctx.landing) {
+      var said = {};
+      sides.forEach(function (s) { if (s.def) return; s.stacks.forEach(function (x) { if (ctx.landing[x.pid] && !said[x.pid]) { said[x.pid] = 1; lines.push('⛵ ' + flavor(rng, 'landing', { p: E.pname(st, x.pid), prov: E.provName(prov) })); } }); });
+    }
     function siegeCount(side) { var c = 0; side.stacks.forEach(function (x) { if (U[x.type].tags.indexOf('siege') >= 0) c += x.n; }); return c; }
     function atkMult(x, si, phase) {
       var m = 1, pl = x.pid !== 'n' ? P(st, x.pid) : null, u = U[x.type];
       if (pl) {
         if (ctx.fx.crusade[x.pid]) m *= 1.4;
-        if (pl.hero.passive === 'horde' && u.tags.indexOf('cav') >= 0) m *= 1.2;
+        if (pl.hero.passive === 'horde' && u.tags.indexOf('cav') >= 0) m *= 1.25;
         var vict = ctx.fx.betray[x.pid];
         if (vict && pids[1 - si].some(function (v) { return vict.indexOf(v) >= 0; })) m *= 1.5;
       }
-      if (terr === 'swamp') m *= 0.75;
+      if (terr === 'swamp' || terr === 'water') m *= 0.75;
+      if (prov && ctx.landing && ctx.landing[x.pid] && !sides[si].def) m *= 0.75;
       if (prov && terr === 'forest' && !sides[si].def && u.tags.indexOf('cav') >= 0) m *= 0.8;
       if (prov && terr === 'hills' && sides[si].def && phase === 'rng') m *= 1.25;
       if (prov && u.tags.indexOf('siege') >= 0 && !sides[si].def && walls > 0 && sides[1 - si].def) m *= 2;
@@ -846,7 +986,7 @@ CH.RULES = [
       var s = sides[si]; if (!s.def || !prov) return 1;
       var m = 1 - (T[terr].def || 0);
       var leff = Math.max(0, walls - siegeCount(sides[1 - si]));
-      m *= (1 - 0.25 * leff);
+      m *= (1 - CH.FORT_DEF * leff);
       var owner = prov.owner && prov.owner !== 'n' ? P(st, prov.owner) : null;
       if (owner && owner.hero.passive === 'motherland' && pids[si].indexOf(prov.owner) >= 0) m *= 0.75;
       return m;
@@ -909,6 +1049,7 @@ CH.RULES = [
         if (vsPlayers) { pl.glory += david ? 2 : 1; }
         if (pl.hero.passive === 'butcher') pl.glory += 1;
         if (david) pl.stats.david = true;
+        if (prov && ctx.landing && ctx.landing[pid]) pl.stats.landing = true;
       });
       // грабёж ушкуйников
       sides[winner].stacks.forEach(function (x) {
@@ -918,7 +1059,7 @@ CH.RULES = [
       lp.forEach(function (pid) { if (pid !== 'n') ctx.rep.groans.push({ pid: pid, big: false }); });
     }
     // чума от требушета
-    if (prov && nTreb > 0 && !(prov.plague > 0) && winner >= 0) {
+    if (prov && T[prov.t].pass && nTreb > 0 && !(prov.plague > 0) && winner >= 0) {
       var chance = Math.min(0.7, 1 - Math.pow(1 - U.trebuchet.plague, nTreb));
       if (rng() < chance) {
         prov.plague = 3;
@@ -942,10 +1083,11 @@ CH.RULES = [
     var rep = { round: st.round, moves: [], battles: [], captures: [], lines: [], groans: [], quests: [], event: null,
                 abilities: [], eliminated: [], plague: [], income: {}, glory: {} };
     var fx = { crusade: {}, betray: {} };
-    var ctx = { st: st, rng: rng, fx: fx, rep: rep };
+    var ctx = { st: st, rng: rng, fx: fx, rep: rep, landing: null };
+    rep.upkeep = {};
     var alive = st.players.filter(function (p) { return p.alive; });
     var gloryBefore = {}; st.players.forEach(function (p) { gloryBefore[p.pid] = p.glory; });
-    st.provs.forEach(function (p) { if (p.burned > 0) p.burned--; });
+    st.provs.forEach(function (p) { if (p.burned > 0) p.burned--; if (p.loot > 0) p.loot--; if (!p.b) p.b = {}; });
 
     // 1. Предательства
     alive.forEach(function (pl) {
@@ -1001,7 +1143,7 @@ CH.RULES = [
     });
 
     // 3. Найм и стены — оплата
-    var pendingRecruits = [], pendingWalls = [];
+    var pendingRecruits = [], pendingBuilds = [];
     alive.forEach(function (pl) {
       var o = ordersBy[pl.pid]; if (!o) return;
       var used = {};
@@ -1017,12 +1159,12 @@ CH.RULES = [
         var give = n * (rc.u === 'militia' && pl.hero.passive === 'miser' ? 2 : 1);
         pendingRecruits.push({ pid: pl.pid, p: rc.p, u: rc.u, n: give });
       });
-      var builtHere = {};
+      var builtKey = {};
       (o.builds || []).forEach(function (b) {
-        var prov = st.provs[b.p]; if (!prov || prov.owner !== pl.pid || !T[prov.t].recruit) return;
-        if (builtHere[b.p] || prov.walls >= CH.MAX_WALLS) return;
-        var c = E.wallCost(pl); if (pl.gold < c) return;
-        pl.gold -= c; builtHere[b.p] = 1; pendingWalls.push({ pid: pl.pid, p: b.p });
+        var key = b.p + ':' + b.b; if (builtKey[key]) return;
+        if (!E.canBuild(st, pl.pid, b.p, b.b)) return;
+        var c = E.buildCost(st, pl, st.provs[b.p], b.b); if (pl.gold < c) return;
+        pl.gold -= c; builtKey[key] = 1; pendingBuilds.push({ pid: pl.pid, p: b.p, b: b.b });
       });
     });
 
@@ -1033,7 +1175,7 @@ CH.RULES = [
       var avail = {};
       st.provs.forEach(function (p) { if (p.armies[pl.pid]) avail[p.id] = Object.assign({}, p.armies[pl.pid]); });
       (o.moves || []).forEach(function (mv) {
-        if (!avail[mv.from] || st.adj[mv.from].indexOf(mv.to) < 0 || !E.passable(st, mv.to)) return;
+        if (!avail[mv.from] || !E.canMove(st, pl.pid, mv.from, mv.to)) return;
         var take = {}, any = false;
         for (var u in mv.u) {
           var n = Math.max(0, Math.min(Math.floor(mv.u[u]), avail[mv.from][u] || 0));
@@ -1043,7 +1185,7 @@ CH.RULES = [
         var src = st.provs[mv.from].armies[pl.pid];
         for (var u2 in take) src[u2] -= take[u2];
         cleanArmies(st.provs[mv.from]);
-        moving.push({ pid: pl.pid, from: mv.from, to: mv.to, army: take });
+        moving.push({ pid: pl.pid, from: mv.from, to: mv.to, army: take, sea: !!T[st.provs[mv.from].t].sea });
         rep.moves.push({ pid: pl.pid, from: mv.from, to: mv.to, n: E.armyTotal(take) });
       });
     });
@@ -1071,7 +1213,7 @@ CH.RULES = [
           ga.forEach(function (m) { for (var u in m.army) if (m.army[u] > 0) sa.stacks.push({ pid: m.pid, type: u, n: m.army[u], ref: m }); });
           gb.forEach(function (m) { for (var u in m.army) if (m.army[u] > 0) sb.stacks.push({ pid: m.pid, type: u, n: m.army[u], ref: m }); });
           if (!sa.stacks.length || !sb.stacks.length) return;
-          ctx.prov = null;
+          ctx.prov = null; ctx.landing = null;
           var res = battle(ctx, [sa, sb]);
           [sa, sb].forEach(function (s) { s.stacks.forEach(function (x) { x.ref.army[x.type] = x.n; }); });
           res.field = true; res.prov = m1.to; res.from = m1.from;
@@ -1082,9 +1224,10 @@ CH.RULES = [
     });
 
     // 4b. Бои в провинциях
-    var arrivals = {};
+    var arrivals = {}, arrSea = {};
     moving.forEach(function (m) {
       if (!E.armyTotal(m.army)) return;
+      if (m.sea && T[st.provs[m.to].t].pass && !st.provs[m.to].armies[m.pid]) { arrSea[m.to] = arrSea[m.to] || {}; arrSea[m.to][m.pid] = true; }
       arrivals[m.to] = arrivals[m.to] || {};
       var a = arrivals[m.to][m.pid] = arrivals[m.to][m.pid] || {};
       addUnits(a, m.army);
@@ -1116,7 +1259,7 @@ CH.RULES = [
           var A, B;
           if (def) { A = def; B = live.filter(function (s) { return s !== def; })[0]; }
           else { A = live[0]; B = live[1]; }
-          ctx.prov = prov;
+          ctx.prov = prov; ctx.landing = arrSea[id] || null;
           var res = battle(ctx, [A, B]);
           res.prov = id;
           rep.battles.push(res);
@@ -1128,7 +1271,7 @@ CH.RULES = [
       prov.armies = present; cleanArmies(prov);
       // владение
       var holders = Object.keys(prov.armies);
-      if (holders.length && holders.indexOf('n') < 0 &&
+      if (T[prov.t].pass && holders.length && holders.indexOf('n') < 0 &&
           !(prov.owner != null && holders.some(function (h) { return E.allied(st, h, prov.owner); }))) {
         holders.sort(function (a, b) { return E.power(prov.armies[b]) - E.power(prov.armies[a]); });
         capture(prov, holders[0], prevOwner);
@@ -1142,6 +1285,11 @@ CH.RULES = [
       if (prov.walls > 0) pl.stats.wallCapture = true;
       if (fx.crusade[pid]) { prov.burned = 2; }
       var victim = prev != null ? P(st, prev) : null;
+      if (victim && !prov.loot) {
+        var lootN = Math.max(1, E.provIncome(st, prov, null));
+        pl.gold += lootN; pl.stats.loot += lootN; prov.loot = 4;
+        if (lootN >= 3 && prov.t !== 'capital') rep.lines.push('💰 ' + flavor(rng, 'loot', { a: pl.hero.name, prov: E.provName(prov), n: lootN }));
+      }
       if (prov.t === 'capital' && st.capitals.indexOf(prov.id) >= 0) {
         var origOwner = st.players.filter(function (p) { return p.capital === prov.id; })[0];
         if (victim) {
@@ -1150,6 +1298,10 @@ CH.RULES = [
         }
         if (!origOwner || origOwner.pid !== pid) { pl.glory += 5; pl.stats.caps++; pl.stats.regicide = true; }
         cap.line = '👑 ' + flavor(rng, 'capital', { a: pl.hero.name, v: victim ? victim.hero.name : 'местный бургомистр', prov: E.provName(prov) });
+        if (victim && victim.gold >= 2) {
+          var steal = Math.floor(victim.gold / 2); victim.gold -= steal; pl.gold += steal; pl.stats.loot += steal;
+          cap.line += ' ' + flavor(rng, 'treasury', { a: pl.hero.name, v: victim.hero.name, n: steal });
+        }
       } else if (prev == null) {
         if (prov.t === 'city' || prov.t === 'monastery' || rng() < 0.15) cap.line = flavor(rng, 'neutral', { a: pl.hero.name, prov: E.provName(prov) });
       }
@@ -1164,7 +1316,12 @@ CH.RULES = [
       prov.armies[rc.pid] = prov.armies[rc.pid] || {};
       prov.armies[rc.pid][rc.u] = (prov.armies[rc.pid][rc.u] || 0) + rc.n;
     });
-    pendingWalls.forEach(function (w) { var prov = st.provs[w.p]; if (prov.owner === w.pid) prov.walls = Math.min(CH.MAX_WALLS, prov.walls + 1); });
+    pendingBuilds.forEach(function (w) {
+      var prov = st.provs[w.p], pl = P(st, w.pid);
+      if (prov.owner !== w.pid) { rep.lines.push(pl.hero.name + ': стройку в «' + E.provName(prov) + '» достраивать некому — провинция уже чужая. Деньги не вернут.'); return; }
+      if (w.b === 'fort') prov.walls = Math.min(CH.MAX_WALLS, prov.walls + 1); else prov.b[w.b] = 1;
+      pl.stats.built++;
+    });
 
     // 6. Чума
     var newPlague = [];
@@ -1195,9 +1352,30 @@ CH.RULES = [
     // 7. Доход и слава
     st.players.forEach(function (pl) {
       if (!pl.alive) return;
-      var inc = E.income(st, pl.pid); pl.gold += inc; rep.income[pl.pid] = inc;
+      var inc = E.income(st, pl.pid), up = E.upkeep(st, pl.pid), have = pl.gold + inc;
+      if (have >= up) pl.gold = have - up;
+      else {
+        pl.gold = 0;
+        var gone = desert(pl.pid, up - have);
+        if (gone) { rep.lines.push('🏃 ' + flavor(rng, 'desert', { p: pl.hero.name, n: gone })); pl.stats.lost += gone; }
+      }
+      rep.income[pl.pid] = inc - up; rep.upkeep[pl.pid] = up;
       pl.glory += E.gloryIncome(st, pl.pid);
     });
+
+    function desert(pid, n) {
+      var gone = 0;
+      while (n > 0) {
+        var pool = [];
+        st.provs.forEach(function (p) { var a = p.armies[pid]; if (a) for (var u in a) if (u !== 'militia' && a[u] > 0) pool.push([p, u, a[u]]); });
+        if (!pool.length) break;
+        var tot = 0; pool.forEach(function (x) { tot += x[2]; });
+        var r = rng() * tot, ch = pool[0];
+        for (var i = 0; i < pool.length; i++) { r -= pool[i][2]; if (r <= 0) { ch = pool[i]; break; } }
+        ch[0].armies[pid][ch[1]]--; cleanArmies(ch[0]); n--; gone++;
+      }
+      return gone;
+    }
 
     // 8. Честные разрывы
     st.breaks.forEach(function (pid) {
@@ -1214,11 +1392,19 @@ CH.RULES = [
       if (!pl.alive) return;
       var provs = E.ownedProvs(st, pl.pid).length, units = E.armyTotal(E.playerUnits(st, pl.pid));
       pl.stats.peakProvs = Math.max(pl.stats.peakProvs, provs);
-      if (!provs && !units) {
+      var canRecruit = st.provs.some(function (p) { return p.owner === pl.pid && T[p.t].recruit; });
+      if (!units && !canRecruit) {
         pl.alive = false; leaveAlliance(st, pl.pid);
         rep.eliminated.push(pl.pid);
         rep.groans.push({ pid: pl.pid, big: true, elim: true });
-        rep.lines.push('💀 ' + flavor(rng, 'elim', { v: pl.hero.name }));
+        rep.lines.push('💀 ' + flavor(rng, provs ? 'exile' : 'elim', { v: pl.hero.name }));
+        // земли выбывшего: гостям-союзникам или местным
+        st.provs.forEach(function (p) {
+          if (p.owner !== pl.pid) return;
+          var holders = Object.keys(p.armies).filter(function (k) { return k !== 'n'; });
+          if (holders.length) { holders.sort(function (a, b) { return E.power(p.armies[b]) - E.power(p.armies[a]); }); p.owner = holders[0]; }
+          else { p.owner = null; p.armies.n = { militia: 2 }; }
+        });
       }
     });
 
@@ -1261,10 +1447,12 @@ CH.RULES = [
         var ok = false;
         switch (q.id) {
           case 'monk': ok = own.filter(function (p) { return p.t === 'monastery'; }).length >= 2; break;
-          case 'banker': ok = pl.gold >= 40; break;
+          case 'banker': ok = pl.gold >= 50; break;
           case 'butcher': ok = pl.stats.kills >= 30; break;
           case 'judas': ok = !!fx.betray[pl.pid]; break;
-          case 'king': ok = own.length >= 12; break;
+          case 'king': ok = own.length >= 14; break;
+          case 'builder': ok = pl.stats.built >= 5; break;
+          case 'admiral': ok = !!pl.stats.landing; break;
           case 'david': ok = !!pl.stats.david; break;
           case 'regicide': ok = !!pl.stats.regicide; break;
           case 'peasant': ok = (units.militia || 0) >= 20; break;
@@ -1315,6 +1503,8 @@ CH.RULES = [
     var ids = CH.EVENT_IDS.filter(function (id) { return id !== st.lastEvent; });
     var alive = st.players.filter(function (p) { return p.alive; });
     var land = st.provs.filter(function (p) { return T[p.t].pass; });
+    if (!st.provs.some(function (p) { return T[p.t].sea && Object.keys(p.armies).length; })) ids = ids.filter(function (x) { return x !== 'storm'; });
+    if (!st.provs.some(function (p) { return p.owner != null && p.b && Object.keys(p.b).length; })) ids = ids.filter(function (x) { return x !== 'fire'; });
     var id = pick(rng, ids), detail = '';
     function fallback() { id = 'eclipse'; detail = ''; }
     switch (id) {
@@ -1340,6 +1530,21 @@ CH.RULES = [
         else { v.glory = Math.max(0, v.glory - 3); detail = v.hero.name + ' не смог заплатить и потерял 3 славы. И пару ногтей.'; }
         break;
       case 'famine': st.mods.famine = true; break;
+      case 'storm':
+        var lostS = 0;
+        st.provs.forEach(function (p) {
+          if (!T[p.t].sea) return;
+          for (var k in p.armies) { var a = p.armies[k]; for (var u in a) { var d = Math.ceil(a[u] / 3); a[u] -= d; lostS += d; } }
+          cleanArmies(p);
+        });
+        detail = 'Утонуло воинов: ' + lostS + '.';
+        break;
+      case 'fire':
+        var withB = st.provs.filter(function (p) { return p.owner != null && p.b && Object.keys(p.b).length; });
+        var fp = pick(rng, withB), bk = pick(rng, Object.keys(fp.b));
+        delete fp.b[bk];
+        detail = 'Сгорело: ' + CH.BUILDINGS[bk].name + ' в «' + E.provName(fp) + '» (' + E.pname(st, fp.owner) + ').';
+        break;
       case 'fair': alive.forEach(function (p) { p.gold += 5; }); break;
       case 'comet':
         var lostM = 0;
@@ -1442,7 +1647,7 @@ CH.RULES = [
       st.adj[p.id].forEach(function (m) {
         var n = st.provs[m]; if (!T[n.t].pass) return;
         var v = value(st, pid, n); if (v <= 0) return;
-        var hp = hostilePower(st, pid, n) * (1 + (T[n.t].def || 0) + 0.25 * n.walls);
+        var hp = hostilePower(st, pid, n) * (1 + (T[n.t].def || 0) + 0.3 * n.walls);
         if (myP > hp * 1.35 + 0.5) { var sc = v / (1 + hp * 0.1) + rng(); if (sc > bs) { bs = sc; best = m; } }
       });
       var keep = (p.t === 'capital' || p.t === 'city') && threat > 0 ? 0.35 : 0;
@@ -1473,9 +1678,23 @@ CH.RULES = [
         if (pl.hero.active === 'bribe' && o.ability != null) gold -= 6;
       }
     }
-    // стены
+    // стройка: сначала доходные здания в тылу, потом укрепления столицы
     var cap = st.provs[pl.capital];
-    if (cap.owner === pid && gold > 30 && cap.walls < CH.MAX_WALLS && rng() < 0.5) { o.builds.push({ p: cap.id }); gold -= E.wallCost(pl); }
+    var canPay = function (c) { return c <= gold - 3; };
+    if (st.round <= st.maxRounds * 0.7) {
+      var mine = E.shuffle(rng, st.provs.filter(function (p) { return p.owner === pid && !(p.plague > 0); }));
+      mine.sort(function (a, b2) { return (dist[b2.id] || 0) - (dist[a.id] || 0); });
+      var nb = 0;
+      mine.forEach(function (p) {
+        if (nb >= 2) return;
+        var opts = E.buildingsFor(st, p.id).filter(function (k) { return k !== 'port' && k !== 'cathedral' && E.canBuild(st, pid, p.id, k); });
+        if (st.round > 4 && E.canBuild(st, pid, p.id, 'cathedral')) opts.push('cathedral');
+        if (!opts.length || (dist[p.id] === 0 && p.t !== 'capital' && p.t !== 'city' && rng() < 0.7)) return;
+        var k = E.pick(rng, opts), c = CH.BUILDINGS[k].cost;
+        if (canPay(c) && c <= gold * 0.6) { o.builds.push({ p: p.id, b: k }); gold -= c; nb++; }
+      });
+    }
+    if (cap.owner === pid && cap.walls < CH.MAX_WALLS && gold > 25 && rng() < 0.5) { var fc = E.fortCost(pl, cap); o.builds.push({ p: cap.id, b: 'fort' }); gold -= fc; }
     // найм
     var sites = st.provs.filter(function (p) { return p.owner === pid && T[p.t].recruit; });
     sites.sort(function (a, b) { return (dist[a.id] || 0) - (dist[b.id] || 0); });
@@ -1534,6 +1753,20 @@ CH.RULES = [
     fire: ['..o..', '.oyo.', '.oyo.', 'oyyyo', '.ooo.'],
     swords: ['q.....q', '.q...q.', '..q.q..', '...q...', '..y.y..', '.y...y.', 'b.....b'],
     wall: ['l.l.l', 'lllll'],
+    // ---- строения ----
+    mill: ['q...q', '.q.q.', '..k..', '.q.q.', 'q.b.q', '.bbb.', '.bBb.'],
+    sawmill: ['l.l.l.', 'llllll', 'bBbBbB', 'bbbbbb'],
+    mine: ['.GGGG.', 'GkkkkG', 'GkkkkG', 'bkykkb', 'bkkkkb'],
+    brewery: ['.bbb.', 'yyyyy', 'bBbBb', 'yyyyy', '.bbb.'],
+    market: ['.ryr.', 'ryryr', 'b...b', 'b...b'],
+    barracks: ['.l.', '.l.', '.l.', 'yyy', '.b.'],
+    cathedral: ['.y.', 'yyy', '.y.', '.w.', 'www', 'wkw'],
+    port: ['.lll.', '.l.l.', '..l..', 'l.l.l', 'l.l.l', '.lll.'],
+    fort: ['l.l.l', 'lllll', 'lgGgl', 'lgkgl'],
+    fort1: ['b.b.b.b.b.b', 'bbbbbbbbbbb', 'BbBbBbBbBbB'],
+    fort2: ['l.l.l.l.l.l', 'lllllllllll', 'GgGgGgGgGgG'],
+    fort3: ['ll.........ll', 'll.l.l.l.l.ll', 'lllllllllllll', 'GGgGgGgGgGgGG'],
+    ship: ['.....b.....', '....qb.....', '...qqb.....', '..qqqb.....', '.....b.....', 'BbbbbbbbbbB', '.BbbbbbbbB.'],
     // ---- цифры 3x5 ----
     d0: ['xxx', 'x.x', 'x.x', 'x.x', 'xxx'], d1: ['.x.', 'xx.', '.x.', '.x.', 'xxx'],
     d2: ['xxx', '..x', 'xxx', 'x..', 'xxx'], d3: ['xxx', '..x', '.xx', '..x', 'xxx'],
@@ -1788,7 +2021,7 @@ CH.RULES = [
 (function () {
   var CH = window.CH;
   var Net = CH.Net = {};
-  var PREFIX = 'chuma-na-vse-doma-v1-';
+  var PREFIX = 'chuma-na-vse-doma-v2-';
   var qs = new URLSearchParams(location.search);
   Net.mode = qs.get('net') === 'local' ? 'local' : qs.get('net') === 'peer' ? 'peer' : 'mqtt';
   Net.CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -1912,7 +2145,7 @@ CH.RULES = [
 
   // ---------- Локальный режим (вкладки одного браузера) ----------
   function localHost(code, h) {
-    var bc = new BroadcastChannel('chuma-' + code), conns = {};
+    var bc = new BroadcastChannel('chuma2-' + code), conns = {};
     bc.onmessage = function (e) {
       var m = e.data; if (m.to !== 'host') return;
       if (m.kind === 'open') { conns[m.from] = 1; bc.postMessage({ to: m.from, kind: 'opened' }); }
@@ -1926,7 +2159,7 @@ CH.RULES = [
     });
   }
   function localJoin(code, h) {
-    var bc = new BroadcastChannel('chuma-' + code), me = 'c' + Math.random().toString(36).slice(2), open = false;
+    var bc = new BroadcastChannel('chuma2-' + code), me = 'c' + Math.random().toString(36).slice(2), open = false;
     bc.onmessage = function (e) {
       var m = e.data;
       if (m.kind === 'hostup') { if (open) { open = false; h.onClose(); } bc.postMessage({ to: 'host', from: me, kind: 'open' }); }
@@ -1959,7 +2192,7 @@ CH.RULES = [
     'wss://mqtt.eclipseprojects.io:443/mqtt'
   ];
   Net.BROKER_NAMES = ['EMQX', 'HiveMQ', 'Mosquitto', 'Eclipse'];
-  var ROOT = 'chumanadoma1/';
+  var ROOT = 'chumanadoma2/';
   var CHUNK = 30000;
 
   // ---------- кодирование пакетов MQTT 3.1.1 ----------
@@ -2174,7 +2407,7 @@ CH.RULES = [
     var S = this;
     S.code = code; S.net = net;
     S.players = []; // {cid, pid, nick, hero, bot}
-    S.rounds = 15; S.orderTime = 75;
+    S.rounds = 20; S.orderTime = 50;
     S.hostCid = null; S.nextPid = 1;
     S.phase = 'lobby'; S.st = null; S.orders = {}; S.ready = {}; S.rready = {}; S.deadline = 0; S.offers = {};
     S.cidConn = {}; S.connCid = {}; S.local = {};
@@ -2216,7 +2449,7 @@ CH.RULES = [
     st.players.forEach(function (p) { if (p.pid !== pid) p.quests = p.quests.map(function (q) { return q.done ? q : { id: '?', done: false }; }); });
     var online = {}; S.players.forEach(function (p) { online[p.pid] = p.bot || S.online(p.cid); });
     var nicks = {}; S.players.forEach(function (p) { nicks[p.pid] = p.bot ? '🤖 бот' : p.nick; });
-    return { t: 'game', st: st, phase: S.phase, timeLeft: Math.max(0, S.deadline - Date.now()), orderTime: S.orderTime,
+    return { t: 'game', st: st, phase: S.phase, timeLeft: Math.max(0, S.deadline - Date.now()), orderTime: S.roundTime(),
              ready: S.phase === 'report' ? S.rready : S.ready, online: online, nicks: nicks, you: pid, isHost: cid === S.hostCid,
              myOrders: pid ? S.orders[pid] || null : null, offers: pid && S.offers[pid] ? Object.keys(S.offers[pid]) : [] };
   };
@@ -2238,8 +2471,8 @@ CH.RULES = [
       case 'pick': if (S.phase === 'lobby' && me) S.pick(me, m); break;
       case 'opts':
         if (isHost && S.phase === 'lobby') {
-          if ([8, 10, 12, 15, 20, 25].indexOf(m.rounds) >= 0) S.rounds = m.rounds;
-          if ([30, 45, 60, 75, 90, 120, 180].indexOf(m.orderTime) >= 0) S.orderTime = m.orderTime;
+          if (CH.ROUND_OPTS.indexOf(m.rounds) >= 0) S.rounds = m.rounds;
+          if (CH.TIME_OPTS.indexOf(m.orderTime) >= 0) S.orderTime = m.orderTime;
           S.broadcastView();
         }
         break;
@@ -2372,8 +2605,14 @@ CH.RULES = [
       var pl = E.player(S.st, p.pid);
       if (p.bot && pl && pl.alive) { S.orders[p.pid] = CH.Bot.orders(S.st, p.pid, S.rng); S.ready[p.pid] = true; }
     });
-    S.deadline = Date.now() + S.orderTime * 1000 + (S.st.round === 1 ? 30000 : 0);
+    S.deadline = Date.now() + S.roundTime() * 1000 + (S.st.round === 1 ? 30000 : 0);
     S.save(); S.broadcastView();
+  };
+
+  // Время на приказы растёт от базового (1-й раунд) до удвоенного (последний)
+  SP.roundTime = function () {
+    var S = this, st = S.st; if (!st) return S.orderTime;
+    return CH.roundTime(S.orderTime, st.round, st.maxRounds);
   };
 
   SP.humans = function () {
@@ -2450,14 +2689,14 @@ CH.RULES = [
     var S = this; if (S.noSave) return;
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({ code: S.code, players: S.players, rounds: S.rounds, orderTime: S.orderTime,
-        hostCid: S.hostCid, nextPid: S.nextPid, phase: S.phase, st: S.st, orders: S.orders, savedAt: Date.now() }));
+        hostCid: S.hostCid, nextPid: S.nextPid, phase: S.phase, st: S.st, orders: S.orders, savedAt: Date.now(), ver: CH.VERSION }));
     } catch (e) {}
   };
   SP.clearSave = function () { if (this.noSave) return; try { localStorage.removeItem(SAVE_KEY); } catch (e) {} };
   Server.loadSave = function () {
     try {
       var d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-      if (!d || !d.st || Date.now() - d.savedAt > 12 * 3600 * 1000) return null;
+      if (!d || !d.st || d.ver !== CH.VERSION || Date.now() - d.savedAt > 12 * 3600 * 1000) return null;
       return d;
     } catch (e) { return null; }
   };
@@ -2465,7 +2704,7 @@ CH.RULES = [
     var S = this;
     S.players = d.players; S.rounds = d.rounds; S.orderTime = d.orderTime; S.hostCid = d.hostCid; S.nextPid = d.nextPid;
     S.st = d.st; S.orders = d.orders || {};
-    if (d.phase === 'orders') { S.phase = 'orders'; S.ready = {}; S.deadline = Date.now() + S.orderTime * 1000 + 20000;
+    if (d.phase === 'orders') { S.phase = 'orders'; S.ready = {}; S.deadline = Date.now() + S.roundTime() * 1000 + 20000;
       S.players.forEach(function (p) { if (p.bot) S.ready[p.pid] = true; }); }
     else if (S.st.phase === 'over') S.phase = 'over';
     else S.startOrders();
@@ -2482,7 +2721,7 @@ CH.RULES = [
       out.moves.push({ from: int(m.from, 9999), to: int(m.to, 9999), u: u });
     });
     (Array.isArray(o.recruits) ? o.recruits : []).slice(0, 80).forEach(function (r) { if (r && CH.UNITS[r.u]) out.recruits.push({ p: int(r.p, 9999), u: r.u, n: int(r.n, 10) }); });
-    (Array.isArray(o.builds) ? o.builds : []).slice(0, 20).forEach(function (b) { if (b) out.builds.push({ p: int(b.p, 9999) }); });
+    (Array.isArray(o.builds) ? o.builds : []).slice(0, 60).forEach(function (b) { if (b && (b.b === 'fort' || CH.BUILDINGS[b.b])) out.builds.push({ p: int(b.p, 9999), b: b.b }); });
     if (o.ability != null) out.ability = o.ability === -1 ? -1 : int(o.ability, 9999);
     out.betray = !!o.betray;
     return out;
@@ -2491,7 +2730,7 @@ CH.RULES = [
 })();
 
 // ============================================================
-//  Пиксельная карта
+//  Карта: пиксельный слой (земля, строения) + чёткий слой (флажки с числами)
 // ============================================================
 (function () {
   var CH = window.CH, E = CH.E, S = CH.Spr, T = CH.TERRAIN;
@@ -2503,7 +2742,8 @@ CH.RULES = [
     water: ['#3a6ea5', '#3667a0', '#4278b0']
   };
   var SEA = ['#2b5785', '#29527e', '#2f5d8f'];
-  var M = CH.MapR = { W: 0, H: 0 };
+  var FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
+  var M = CH.MapR = { W: 0, H: 0, scale: 1, dpr: 1 };
 
   function rgb(h) { return S.rgb(h); }
   function mix(a, b, f) { return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
@@ -2516,9 +2756,10 @@ CH.RULES = [
     return [Math.round(OX + SQ3 * R * (c + 0.5 * (r & 1)) + SQ3 * R / 2), Math.round(OY + 1.5 * R * r + R)];
   };
 
-  M.init = function (canvas, st) {
+  M.init = function (canvas, fxCanvas, st) {
     M.canvas = canvas; M.ctx = canvas.getContext('2d');
-    if (M.cols === st.cols && M.rows === st.rows && M.lut) { M.fit(); return; }
+    M.fxc = fxCanvas; M.fx = fxCanvas.getContext('2d');
+    if (M.cols === st.cols && M.rows === st.rows && M.lut && canvas.width === M.W) { M.fit(); return; }
     M.cols = st.cols; M.rows = st.rows;
     var W = M.W = Math.ceil(OX * 2 + SQ3 * R * (st.cols + 0.5));
     var H = M.H = Math.ceil(OY * 2 + 1.5 * R * (st.rows - 1) + 2 * R);
@@ -2544,15 +2785,37 @@ CH.RULES = [
     M.fit();
   };
 
+  // Масштаб: по умолчанию карта целиком; на маленьких экранах — чуть крупнее, с прокруткой пальцем
+  M.ZOOMS = [1, 1.3, 1.7, 2.2];
+  M.userZoom = null;
   M.fit = function () {
     if (!M.canvas) return;
-    var p = M.canvas.parentNode; if (!p) return;
-    var pw = p.clientWidth, ph = p.clientHeight;
-    var sc = Math.min(pw / M.W, ph / M.H);
-    if (sc > 3) sc = Math.floor(sc);
+    var box = M.canvas.parentNode, p = box && box.parentNode; if (!p) return;
+    var pw = p.clientWidth, ph = p.clientHeight; if (!pw || !ph) return;
+    var fit = Math.min(pw / M.W, ph / M.H);
+    var z = M.userZoom != null ? M.userZoom : Math.max(1, Math.min(1.7, 34 / (SQ3 * R * fit)));
+    M.zoom = z;
+    var sc = fit * z;
+    if (sc > 3 && z === 1) sc = Math.floor(sc);
     M.scale = sc;
-    M.canvas.style.width = Math.floor(M.W * sc) + 'px';
-    M.canvas.style.height = Math.floor(M.H * sc) + 'px';
+    var cw = Math.floor(M.W * sc), chh = Math.floor(M.H * sc);
+    box.style.width = cw + 'px'; box.style.height = chh + 'px';
+    M.dpr = Math.min(z > 1.01 ? 2 : 3, window.devicePixelRatio || 1);
+    var fw = Math.round(cw * M.dpr), fh = Math.round(chh * M.dpr);
+    if (M.fxc.width !== fw || M.fxc.height !== fh) { M.fxc.width = fw; M.fxc.height = fh; }
+  };
+  M.stepZoom = function (dir) {
+    var box = M.canvas.parentNode, p = box.parentNode;
+    var rx = (p.scrollLeft + p.clientWidth / 2) / (box.offsetWidth || 1), ry = (p.scrollTop + p.clientHeight / 2) / (box.offsetHeight || 1);
+    var i = 0; M.ZOOMS.forEach(function (z, k) { if (Math.abs(z - M.zoom) < Math.abs(M.ZOOMS[i] - M.zoom)) i = k; });
+    if (dir > 0 && M.ZOOMS[i] <= M.zoom + 0.01) i++; else if (dir < 0 && M.ZOOMS[i] >= M.zoom - 0.01) i--;
+    i = Math.max(0, Math.min(M.ZOOMS.length - 1, i));
+    M.userZoom = M.ZOOMS[i]; M.fit();
+    p.scrollLeft = rx * box.offsetWidth - p.clientWidth / 2; p.scrollTop = ry * box.offsetHeight - p.clientHeight / 2;
+  };
+  M.focus = function (id) {
+    var box = M.canvas.parentNode, p = box.parentNode, c = M.center(id);
+    p.scrollLeft = c[0] * M.scale - p.clientWidth / 2; p.scrollTop = c[1] * M.scale - p.clientHeight / 2;
   };
 
   M.renderBase = function (st, colors) {
@@ -2573,7 +2836,6 @@ CH.RULES = [
         if (p.owner != null && pass && ownerRgb[p.owner]) c = mix(c, ownerRgb[p.owner], 0.3);
         if (p.plague > 0) c = mix(c, plagueC, 0.35);
         if (p.burned > 0) c = mix(c, burnC, 0.35);
-        // границы
         var edgeOwner = false, edge = false;
         for (var oy = -1; oy <= 1; oy++) for (var ox = -1; ox <= 1; ox++) {
           if (!ox && !oy) continue;
@@ -2586,46 +2848,55 @@ CH.RULES = [
           }
         }
         if (edgeOwner) c = mix(ownerRgb[p.owner] || c, [255, 255, 255], 0.1);
-        else if (edge) c = mix(c, [20, 14, 10], 0.45);
+        else if (edge) c = mix(c, [20, 14, 10], p.t === 'water' ? 0.18 : 0.45);
       }
       d[idx * 4] = c[0]; d[idx * 4 + 1] = c[1]; d[idx * 4 + 2] = c[2]; d[idx * 4 + 3] = 255;
     }
     M.bctx.putImageData(img, 0, 0);
-    // декор
+    // декор и строения
     var b = M.bctx;
     st.provs.forEach(function (p) {
       var cc = M.center(p.id), cx = cc[0], cy = cc[1], rr = E.rngFrom(p.id * 7919 + 13);
-      var oc = p.owner != null ? colors[p.owner] : '#9a9a9a';
+      var oc = p.owner != null ? colors[p.owner] : '#9a9a9a', B = p.b || {};
       switch (p.t) {
         case 'forest':
           [[-7, -8], [1, -9], [-3, -2], [4, -3], [-8, 0]].forEach(function (o, i) { if (i < 3 || rr() < 0.5) S.draw(b, rr() < 0.5 ? 'tree' : 'tree2', cx + o[0] - 2, cy + o[1] - 2); });
+          if (B.sawmill) S.draw(b, 'sawmill', cx - 3, cy - 5);
           break;
-        case 'hills': S.draw(b, 'hill', cx - 9, cy - 6); S.draw(b, 'hill', cx - 1, cy - 9); if (rr() < 0.6) S.draw(b, 'hill', cx - 5, cy - 2); break;
+        case 'hills':
+          S.draw(b, 'hill', cx - 9, cy - 6); S.draw(b, 'hill', cx - 1, cy - 9); if (rr() < 0.6) S.draw(b, 'hill', cx - 5, cy - 2);
+          if (B.mine) S.draw(b, 'mine', cx - 3, cy - 5);
+          break;
         case 'swamp': S.draw(b, 'reeds', cx - 8, cy - 7); S.draw(b, 'reeds', cx + 1, cy - 4); break;
         case 'mountain': S.draw(b, 'mountain', cx - 6, cy - 7); if (rr() < 0.7) S.draw(b, 'mountain', cx - 1, cy - 3); break;
-        case 'water': S.draw(b, 'wave', cx - 6, cy - 4); S.draw(b, 'wave', cx + 1, cy + 1); S.draw(b, 'wave', cx - 3, cy + 5); break;
-        case 'village': S.draw(b, 'village', cx - 5, cy - 8); S.draw(b, 'tree', cx + 3, cy - 9); break;
-        case 'monastery': S.draw(b, 'monastery', cx - 3, cy - 11); break;
+        case 'water':
+          S.draw(b, 'wave', cx - 6, cy - 4); S.draw(b, 'wave', cx + 1, cy + 1); S.draw(b, 'wave', cx - 3, cy + 5);
+          if (Object.keys(p.armies).length) S.draw(b, 'ship', cx - 5, cy - 8);
+          break;
+        case 'village':
+          S.draw(b, 'village', cx - 5, cy - 8);
+          if (B.mill) S.draw(b, 'mill', cx + 3, cy - 9); else S.draw(b, 'tree', cx + 3, cy - 9);
+          break;
+        case 'monastery': S.draw(b, 'monastery', cx - 3, cy - 11); if (B.brewery) S.draw(b, 'brewery', cx + 4, cy - 6); break;
         case 'city': S.draw(b, 'city', cx - 4, cy - 9, oc); break;
         case 'capital': S.draw(b, 'capital', cx - 5, cy - 11, oc); break;
         case 'plain':
           if (rr() < 0.5) { b.fillStyle = '#c9d86a'; b.fillRect(cx - 5 + Math.floor(rr() * 8), cy - 6 + Math.floor(rr() * 6), 1, 1); }
           if (rr() < 0.4) { b.fillStyle = '#e8e2b0'; b.fillRect(cx - 2 + Math.floor(rr() * 6), cy - 7 + Math.floor(rr() * 6), 1, 1); }
+          if (B.mill) S.draw(b, 'mill', cx - 2, cy - 9);
           break;
+      }
+      if (B.market) S.draw(b, 'market', cx - 10, cy - 6);
+      if (B.barracks) S.draw(b, 'barracks', cx + 7, cy - 7);
+      if (B.cathedral) S.draw(b, 'cathedral', cx + 7, cy - 2);
+      if (B.port) S.draw(b, 'port', cx - 10, cy - 1);
+      if (T[p.t].pass && p.walls > 0) {
+        if (p.walls >= 3) S.draw(b, 'fort3', cx - 6, cy - 2); else S.draw(b, 'fort' + p.walls, cx - 5, cy - 1);
       }
     });
   };
 
-  function flag(ctx, x, y, color, n) {
-    var txt = String(Math.min(999, n)), w = txt.length * 4 + 3;
-    x = Math.round(x - w / 2);
-    ctx.fillStyle = '#1a1410'; ctx.fillRect(x - 1, y - 1, w + 2, 9);
-    ctx.fillStyle = color; ctx.fillRect(x, y, w, 7);
-    S.digits(ctx, txt, x + 2, y + 1, lum(color) > 0.6 ? '#1a1410' : '#ffffff');
-    return w + 2;
-  }
-  M.flag = flag;
-
+  // ---------- пиксельные примитивы ----------
   function line(ctx, x0, y0, x1, y1, color, shadow) {
     var dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx + dy;
     while (true) {
@@ -2637,16 +2908,14 @@ CH.RULES = [
       if (e2 <= dx) { err += dx; y0 += sy; }
     }
   }
-  function arrow(ctx, a, b, color, n, t) {
+  function arrow(ctx, a, b, color) {
     var A = M.center(a), B = M.center(b);
     var x0 = A[0], y0 = A[1] - 1, x1 = Math.round(A[0] + (B[0] - A[0]) * 0.78), y1 = Math.round(A[1] - 1 + (B[1] - A[1]) * 0.78);
     line(ctx, x0, y0, x1, y1, color, '#1a1410');
     line(ctx, x0 + (y1 !== y0 ? 1 : 0), y0 + (y1 === y0 ? 1 : 0), x1 + (y1 !== y0 ? 1 : 0), y1 + (y1 === y0 ? 1 : 0), color);
     ctx.fillStyle = '#1a1410'; ctx.fillRect(x1 - 2, y1 - 2, 5, 5);
     ctx.fillStyle = color; ctx.fillRect(x1 - 1, y1 - 1, 3, 3);
-    if (n) { var mx = Math.round((x0 + x1) / 2), my = Math.round((y0 + y1) / 2) - 4; flag(ctx, mx, my, color, n); }
   }
-
   function outline(ctx, id, color, dotted, phase) {
     var bnd = M.bounds[id]; if (!bnd) return;
     ctx.fillStyle = color;
@@ -2656,40 +2925,74 @@ CH.RULES = [
     }
   }
 
+  // ---------- чёткий слой: флажки ----------
+  function rrect(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.arcTo(x + w, y, x + w, y + r, r); g.lineTo(x + w, y + h - r);
+    g.arcTo(x + w, y + h, x + w - r, y + h, r); g.lineTo(x + r, y + h); g.arcTo(x, y + h, x, y + h - r, r); g.lineTo(x, y + r); g.arcTo(x, y, x + r, y, r); g.closePath();
+  }
+  function flagSize(g, n, fs) { return Math.ceil(g.measureText(String(n)).width + fs * 0.7); }
+  // army: {unit: n} или null — тогда без полоски состава
+  function flag(g, cx, cy, color, n, fs, army) {
+    var w = flagSize(g, n, fs), h = Math.round(fs * 1.22), bar = army ? Math.max(2, Math.round(fs * 0.24)) : 0;
+    var x = Math.round(cx - w / 2), y = Math.round(cy - (h + bar) / 2), lw = Math.max(1, Math.round(fs * 0.13));
+    g.fillStyle = '#1a1410'; rrect(g, x - lw, y - lw, w + 2 * lw, h + bar + 2 * lw, fs * 0.28); g.fill();
+    g.fillStyle = color; rrect(g, x, y, w, h, fs * 0.18); g.fill();
+    g.fillStyle = lum(color) > 0.6 ? '#1a1410' : '#ffffff';
+    g.fillText(String(n), x + w / 2, y + h / 2 + fs * 0.04);
+    if (army) {
+      var cls = {}, tot = 0, k;
+      for (k in army) { var c = CH.UNIT_UI[k].cls; cls[c] = (cls[c] || 0) + army[k]; tot += army[k]; }
+      var bx = x, order = ['inf', 'ranged', 'cav', 'siege'], present = order.filter(function (c) { return cls[c]; });
+      present.forEach(function (c, i) {
+        var bw = i === present.length - 1 ? x + w - bx : Math.max(2, Math.round(w * cls[c] / tot));
+        g.fillStyle = CH.CLASSES[c].color; g.fillRect(bx, y + h, bw, bar); bx += bw;
+      });
+    }
+    return w + 2 * lw;
+  }
+
   // o: { sel, targets, targetColor, moves:[{from,to,color,n}], battles:[ids], flash:[ids], t }
   M.draw = function (o) {
     var ctx = M.ctx, st = M.st; if (!ctx || !st) return;
     var t = o.t || 0, blink = Math.floor(t / 400) % 2 === 0;
     ctx.drawImage(M.base, 0, 0);
-    (o.moves || []).forEach(function (m) { arrow(ctx, m.from, m.to, m.color, 0, t); });
-    // армии
-    st.provs.forEach(function (p) {
-      var keys = Object.keys(p.armies); if (!keys.length) return;
-      var c = M.center(p.id), total = 0;
-      var parts = keys.map(function (k) { var n = E.armyTotal(p.armies[k]); return [k, n]; }).filter(function (x) { return x[1] > 0; });
-      var x = c[0] - (parts.length - 1) * 6;
-      parts.forEach(function (pt) {
-        var col = pt[0] === 'n' ? '#5f5a52' : (M.colors[pt[0]] || '#fff');
-        x += flag(ctx, x, c[1] + 2, col, pt[1]) / 2 + 1;
-      });
-    });
+    (o.moves || []).forEach(function (m) { arrow(ctx, m.from, m.to, m.color); });
     st.provs.forEach(function (p) {
       var c = M.center(p.id);
-      if (p.plague > 0 && blink) S.draw(ctx, 'skull', c[0] - 10, c[1] - 9);
+      if (p.plague > 0 && blink) S.draw(ctx, 'skull', c[0] - 2, c[1] - 11);
       if (p.burned > 0) S.draw(ctx, 'fire', c[0] + 5, c[1] - 9);
     });
     (o.flash || []).forEach(function (id) { if (blink) outline(ctx, id, '#ffffff', false); });
     (o.targets || []).forEach(function (id) { outline(ctx, id, o.targetColor || '#f1c40f', true, Math.floor(t / 150)); });
+    (o.battles || []).forEach(function (id) { var c = M.center(id); if (blink) S.draw(ctx, 'swords', c[0] - 3, c[1] - 12); });
+    if (o.sel != null && o.sel >= 0) outline(ctx, o.sel, blink ? '#ffffff' : '#f1c40f', false);
+
+    // флажки
+    var g = M.fx, k = M.scale * M.dpr; if (!g) return;
+    g.clearRect(0, 0, M.fxc.width, M.fxc.height);
+    var fs = Math.round(Math.max(11 * M.dpr, 5.6 * k));
+    g.font = '700 ' + fs + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle';
+    st.provs.forEach(function (p) {
+      var keys = Object.keys(p.armies); if (!keys.length) return;
+      var c = M.center(p.id);
+      var parts = keys.map(function (pk) { return [pk, E.armyTotal(p.armies[pk])]; }).filter(function (x) { return x[1] > 0; });
+      var gap = Math.round(fs * 0.25), tot = -gap;
+      parts.forEach(function (pt) { tot += flagSize(g, pt[1], fs) + Math.round(fs * 0.26) + gap; });
+      var x = (c[0] + 0.5) * k - tot / 2, y = (c[1] + 7) * k;
+      parts.forEach(function (pt) {
+        var col = pt[0] === 'n' ? '#5f5a52' : (M.colors[pt[0]] || '#fff');
+        var w = flagSize(g, pt[1], fs) + Math.round(fs * 0.26);
+        flag(g, x + w / 2, y, col, pt[1], fs, p.armies[pt[0]]);
+        x += w + gap;
+      });
+    });
+    var fs2 = Math.round(fs * 0.88);
+    g.font = '700 ' + fs2 + 'px ' + FONT;
     (o.moves || []).forEach(function (m) {
       if (!m.n) return;
       var A = M.center(m.from), B = M.center(m.to);
-      flag(ctx, Math.round(A[0] + (B[0] - A[0]) * 0.62), Math.round(A[1] + (B[1] - A[1]) * 0.62) - 6, m.color, m.n);
+      flag(g, (A[0] + (B[0] - A[0]) * 0.6 + 0.5) * k, (A[1] - 1 + (B[1] - A[1]) * 0.6 - 3) * k, m.color, m.n, fs2, null);
     });
-    (o.battles || []).forEach(function (id) {
-      var c = M.center(id);
-      if (blink) S.draw(ctx, 'swords', c[0] - 3, c[1] - 12);
-    });
-    if (o.sel != null && o.sel >= 0) outline(ctx, o.sel, blink ? '#ffffff' : '#f1c40f', false);
   };
 
   M.pick = function (clientX, clientY) {
@@ -2762,7 +3065,7 @@ CH.RULES = [
     var save = CH.Server.loadSave();
     var heroes = CH.HERO_ORDER.map(function (k) { var h = CH.HEROES[k]; return '<div class="ph">' + S.img('p_' + k, 4) + '<span>' + esc(h.name) + '</span></div>'; }).join('');
     $('#app').innerHTML =
-      '<div id="title"><div><div class="logo">ЧУМА НА ВСЕ<br>ВАШИ ДОМА<small>средневековая стратегия для 2–8 сволочей</small></div>' +
+      '<div id="title"><div><div class="logo">ЧУМА НА ВСЕ<br>ВАШИ ДОМА<small>средневековая стратегия для 2–8 сволочей · версия ' + CH.VERSION + '</small></div>' +
       '<div class="title-heroes">' + heroes + '</div></div>' +
       '<div class="title-menu frame">' +
       '<div class="nickrow"><div class="small muted">Как тебя звать, смерд?</div><input type="text" id="nick" maxlength="16" placeholder="Твоё имя" value="' + esc(App.nick) + '"></div>' +
@@ -2912,11 +3215,11 @@ CH.RULES = [
     }).join('');
     cards += '<div class="hcard" data-new="1" style="justify-content:center;min-height:62px"><div class="hn">＋ Свой герой</div></div>';
     var opts = L.isHost ?
-      '<div class="row small">Раундов: <select id="o-r">' + [8, 10, 12, 15, 20, 25].map(function (n) { return '<option ' + (n === L.rounds ? 'selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' +
-      ' Время хода: <select id="o-t">' + [30, 45, 60, 75, 90, 120, 180].map(function (n) { return '<option value="' + n + '" ' + (n === L.orderTime ? 'selected' : '') + '>' + n + ' с</option>'; }).join('') + '</select></div>' +
-      '<div class="small muted">≈ ' + Math.round(L.rounds * (L.orderTime + 15) / 60) + ' мин на катку</div>' +
+      '<div class="row small">Раундов: <select id="o-r">' + CH.ROUND_OPTS.map(function (n) { return '<option ' + (n === L.rounds ? 'selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' +
+      ' Время хода: <select id="o-t">' + CH.TIME_OPTS.map(function (n) { return '<option value="' + n + '" ' + (n === L.orderTime ? 'selected' : '') + '>' + n + ' → ' + n * 2 + ' с</option>'; }).join('') + '</select></div>' +
+      '<div class="small muted">Время на раунд растёт от первого раунда к последнему. Катка: до ' + Math.round(L.rounds * (L.orderTime * 1.5 + 15) / 60) + ' мин, быстрее — если все жмут «Готов».</div>' +
       '<div class="row"><button class="btn small wood" id="b-bot">+ Бот</button><button class="btn gold sp" id="b-start">⚔ Начать передел!</button></div>'
-      : '<div class="small muted">Раундов: ' + L.rounds + ', ход ' + L.orderTime + ' с. Ждём, пока хост начнёт. Можно пока точить вилы.</div>';
+      : '<div class="small muted">Раундов: ' + L.rounds + ', время хода ' + L.orderTime + ' → ' + L.orderTime * 2 + ' с. Ждём, пока хост начнёт. Можно пока точить вилы.</div>';
     $('#app').innerHTML = '<div id="lobby"><div class="left">' +
       '<div class="frame">' + (solo ? '<h3>Тренировка</h3><div class="small muted">Ты и боты. Боты не обижаются, когда их предают.</div>' :
         '<div class="small muted">Код комнаты</div><div class="row"><span class="code">' + esc(L.code) + '</span><button class="btn small gold" id="b-share">Позвать друзей</button></div>' +
@@ -3010,8 +3313,10 @@ CH.RULES = [
     var prevRound = App.st ? App.st.round : 0, prevPhase = App.phase;
     App.st = m.st; App.phase = m.phase; App.deadline = Date.now() + m.timeLeft; App.ready = m.ready; App.online = m.online;
     App.nicks = m.nicks; App.you = m.you; App.isHost = m.isHost; App.orderTime = m.orderTime;
-    if (App.screen !== 'game') buildGame();
-    M.init($('#map'), App.st);
+    var fresh = App.screen !== 'game';
+    if (fresh) buildGame();
+    M.init($('#map'), $('#mapfx'), App.st);
+    if (fresh && me()) M.focus(me().capital);
     M.renderBase(App.st, colors());
     if (m.phase === 'orders' && App.draftRound !== App.st.round) {
       App.draft = m.myOrders || E.emptyOrders(); App.draftRound = App.st.round;
@@ -3037,9 +3342,12 @@ CH.RULES = [
       '<span class="dot on" id="tb-conn"></span><span class="tb" id="tb-round"></span><span class="tb" id="tb-timer"></span>' +
       '<span class="tb" id="tb-gold"></span><span class="tb" id="tb-glory"></span><span class="sp"></span>' +
       '<button class="btn wood" id="b-dip">Союзы</button><button class="btn wood" id="b-log">Летопись</button><button class="btn ghost" id="b-menu">☰</button></div>' +
-      '<div id="main"><div id="mapwrap"><canvas id="map"></canvas><div id="phasebadge"></div><div id="maphint"></div></div>' +
+      '<div id="main"><div id="mapwrap"><div id="mapscroll"><div id="mapbox"><canvas id="map"></canvas><canvas id="mapfx"></canvas></div></div>' +
+      '<div id="zoom"><button class="btn small wood" id="z-in">＋</button><button class="btn small wood" id="z-out">－</button></div><div id="phasebadge"></div><div id="maphint"></div></div>' +
       '<div id="panel"><div id="panel-body"></div><div id="panel-foot"></div></div></div></div>';
     $('#map').addEventListener('click', function (e) { onMapTap(M.pick(e.clientX, e.clientY)); });
+    $('#z-in').onclick = function () { A.play('click'); M.stepZoom(1); };
+    $('#z-out').onclick = function () { A.play('click'); M.stepZoom(-1); };
     $('#b-dip').onclick = function () { A.play('click'); showDip(); };
     $('#b-log').onclick = function () { A.play('click'); if (App.st.lastReport) showReport(App.st.lastReport, false); else toast('Летопись пока пуста. Сделай что-нибудь ужасное.'); };
     $('#b-menu').onclick = function () { A.play('click'); showMenu(); };
@@ -3068,7 +3376,7 @@ CH.RULES = [
     if (App.phase === 'orders' && mine && mine.alive) {
       App.draft.moves.forEach(function (m) { o.moves.push({ from: m.from, to: m.to, color: mine.hero.color, n: E.armyTotal(m.u) }); });
       if (App.mode === 'ability') { o.targets = E.abilityTargets(st, App.you); o.targetColor = '#c77dff'; }
-      else if (App.sel != null && E.armyTotal(myArmy(App.sel)) > 0) o.targets = st.adj[App.sel].filter(function (x) { return E.passable(st, x); });
+      else if (App.sel != null && E.armyTotal(myArmy(App.sel)) > 0) o.targets = st.adj[App.sel].filter(function (x) { return E.canMove(st, App.you, App.sel, x); });
       if (App.draft.ability != null && App.draft.ability >= 0) o.flash.push(App.draft.ability);
     } else if (App.phase === 'report' || (App.phase === 'over' && st.lastReport)) {
       var rep = st.lastReport;
@@ -3079,15 +3387,18 @@ CH.RULES = [
     M.draw(o);
   }
 
+  function netIncome() { return E.income(App.st, App.you) - E.upkeep(App.st, App.you); }
+  function signed(n) { return (n >= 0 ? '+' : '−') + Math.abs(n); }
   function renderTop() {
     var st = App.st, pl = me();
     $('#tb-round').innerHTML = 'Раунд ' + st.round + '/' + st.maxRounds;
     if (pl) {
-      var left = budget();
-      $('#tb-gold').innerHTML = S.img('e_coin', 2) + (App.phase === 'orders' && left !== pl.gold ? left + '<span class="muted">/' + pl.gold + '</span>' : pl.gold);
-      $('#tb-glory').innerHTML = S.img('e_star', 2) + pl.glory;
+      var left = budget(), net = netIncome();
+      $('#tb-gold').innerHTML = S.img('e_coin', 2) + (App.phase === 'orders' && left !== pl.gold ? left + '<span class="muted">/' + pl.gold + '</span>' : pl.gold) +
+        (pl.alive ? ' <span class="net' + (net < 0 ? ' neg' : '') + '">' + signed(net) + '</span>' : '');
+      $('#tb-glory').innerHTML = S.img('e_star', 2) + pl.glory + (pl.alive ? ' <span class="net">+' + E.gloryIncome(st, App.you) + '</span>' : '');
     } else { $('#tb-gold').innerHTML = '<span class="muted">зритель</span>'; $('#tb-glory').innerHTML = ''; }
-    var badge = App.phase === 'orders' ? 'Приказы' : App.phase === 'report' ? 'Итоги раунда' : App.phase === 'over' ? 'Конец' : '';
+    var badge = App.phase === 'orders' ? 'Приказы · ' + App.orderTime + ' с на раунд' : App.phase === 'report' ? 'Итоги раунда' : App.phase === 'over' ? 'Конец' : '';
     $('#phasebadge').textContent = badge;
     var hint = '';
     if (App.phase === 'orders' && pl && pl.alive) {
@@ -3121,25 +3432,26 @@ CH.RULES = [
   function budget() {
     var pl = me(); if (!pl) return 0;
     if (App.phase !== 'orders' || !App.draft) return pl.gold;
-    var spent = 0;
-    App.draft.recruits.forEach(function (r) { spent += r.n * E.unitCost(App.st, pl, r.u); });
-    spent += App.draft.builds.length * E.wallCost(pl);
+    var spent = 0, st = App.st;
+    App.draft.recruits.forEach(function (r) { spent += r.n * E.unitCost(st, pl, r.u); });
+    App.draft.builds.forEach(function (b) { spent += E.buildCost(st, pl, st.provs[b.p], b.b); });
     if (pl.hero.active === 'bribe' && App.draft.ability != null) spent += CH.ACTIVES.bribe.cost;
     return pl.gold - spent;
   }
   function slotsUsed(id) { return App.draft.recruits.filter(function (r) { return r.p === id; }).reduce(function (s, r) { return s + r.n; }, 0); }
+  function queued(p, b) { return App.draft.builds.filter(function (x) { return x.p === p && x.b === b; })[0]; }
   function pruneDraft() {
     if (!App.draft || !App.st || App.phase !== 'orders') return;
     var st = App.st;
     App.draft.moves = App.draft.moves.filter(function (m) {
       var a = myArmy(m.from);
       for (var k in m.u) { m.u[k] = Math.min(m.u[k], a[k] || 0); if (!m.u[k]) delete m.u[k]; }
-      return E.armyTotal(m.u) > 0;
+      return E.armyTotal(m.u) > 0 && E.canMove(st, App.you, m.from, m.to);
     });
     App.draft.recruits = App.draft.recruits.filter(function (r) { return st.provs[r.p].owner === App.you; });
-    App.draft.builds = App.draft.builds.filter(function (b) { return st.provs[b.p].owner === App.you; });
+    App.draft.builds = App.draft.builds.filter(function (b) { return E.canBuild(st, App.you, b.p, b.b); });
+    while (budget() < 0 && App.draft.builds.length) App.draft.builds.pop();
     while (budget() < 0 && App.draft.recruits.length) { var r = App.draft.recruits[App.draft.recruits.length - 1]; r.n--; if (!r.n) App.draft.recruits.pop(); }
-    if (budget() < 0) App.draft.builds = [];
   }
   var sendTimer = null;
   function changed() {
@@ -3158,24 +3470,73 @@ CH.RULES = [
       return;
     }
     if (id < 0) { App.sel = null; App.focusMove = null; renderPanel(); renderTop(); return; }
-    var sel = App.sel;
-    if (canOrder() && sel != null && sel !== id && E.armyTotal(myArmy(sel)) > 0 && st.adj[sel].indexOf(id) >= 0 && E.passable(st, id)) {
-      var mv = App.draft.moves.filter(function (m) { return m.from === sel && m.to === id; })[0];
-      if (!mv) {
-        var a = avail(sel), u = {}; for (var k in a) if (a[k] > 0) u[k] = a[k];
-        if (!E.armyTotal(u)) { toast('Все войска отсюда уже в походе. Клонировать крестьян не умеем.'); return; }
-        mv = { from: sel, to: id, u: u }; App.draft.moves.push(mv); A.play('march');
-      } else A.play('click');
-      App.focusMove = mv; changed(); return;
+    var sel = App.sel, tt = T[st.provs[id].t];
+    if (canOrder() && sel != null && sel !== id && E.armyTotal(myArmy(sel)) > 0 && st.adj[sel].indexOf(id) >= 0) {
+      if (E.canMove(st, App.you, sel, id)) {
+        var mv = App.draft.moves.filter(function (m) { return m.from === sel && m.to === id; })[0];
+        if (!mv) {
+          var a = avail(sel), u = {}; for (var k in a) if (a[k] > 0) u[k] = a[k];
+          if (!E.armyTotal(u)) { toast('Все войска отсюда уже в походе. Клонировать крестьян не умеем.'); return; }
+          mv = { from: sel, to: id, u: u }; App.draft.moves.push(mv); A.play('march');
+        } else A.play('click');
+        App.focusMove = mv; changed(); return;
+      }
+      if (tt.sea) { toast('В море можно выйти только из провинции с портом. Построй порт на берегу — вплавь рыцари не умеют.', 'error'); return; }
     }
-    if (!E.passable(st, id)) { App.sel = null; renderPanel(); renderTop(); toast(T[st.provs[id].t].desc); return; }
+    if (!tt.pass && !tt.sea) { App.sel = null; renderPanel(); renderTop(); toast(tt.desc); return; }
     App.sel = id; App.focusMove = null; A.play('click'); renderPanel(); renderTop();
   }
 
+  // ---------- отряды ----------
+  function ucls(u) { return CH.UNIT_UI[u].cls; }
+  function chip(u, n, extra) { return '<span class="u c-' + ucls(u) + '" data-act="uinfo" data-u="' + u + '">' + S.unit(u, 2) + '<b>' + n + '</b>' + (extra || '') + '</span>'; }
   function armyHtml(a) {
-    return '<div class="army">' + Object.keys(a).filter(function (k) { return a[k] > 0; }).map(function (k) {
-      return '<span class="u" data-act="uinfo" data-u="' + k + '">' + S.unit(k, 2) + '<b>' + a[k] + '</b></span>';
-    }).join('') + '</div>';
+    return '<div class="army">' + Object.keys(a).filter(function (k) { return a[k] > 0; }).map(function (k) { return chip(k, a[k]); }).join('') + '</div>';
+  }
+  function statbar(label, v, max, col) { return '<div class="statbar"><span>' + label + '</span><i><em style="width:' + Math.round(v / max * 100) + '%;background:' + col + '"></em></i><b>' + v + '</b></div>'; }
+  function unitCard(u) {
+    var x = U[u], ui = CH.UNIT_UI[u], c = CH.CLASSES[ui.cls];
+    return '<div class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:12px"><span class="ubig c-' + ui.cls + '">' + S.unit(u, 5) + '</span><div class="sp"><h3>' + esc(x.name) + '</h3>' +
+      '<span class="ctag" style="background:' + c.color + '">' + c.name + '</span> <span class="small">' + x.cost + ' зол.' + (u === 'militia' ? ' · без жалованья' : '') + (x.unique ? ' · уникальный' : '') + '</span>' +
+      statbar('Ближний бой', x.atk, 7, '#e0803a') + statbar('Залп', x.rng, 6, '#5cc24a') + statbar('Здоровье', x.hp, 11, '#d0412f') + '</div></div>' +
+      '<div class="small" style="margin-top:6px"><b class="good">Сила:</b> ' + esc(ui.strong) + '<br><b class="bad">Слабость:</b> ' + esc(ui.weak) + '</div>' +
+      '<div class="small muted" style="margin-top:4px">' + esc(x.desc) + '</div>';
+  }
+  function showUnit(u) { A.play('click'); modal(unitCard(u)); }
+  function classLegend() {
+    return '<div class="legend">' + Object.keys(CH.CLASSES).map(function (k) { return '<span><i style="background:' + CH.CLASSES[k].color + '"></i>' + CH.CLASSES[k].name + '</span>'; }).join('') + '</div>' +
+      '<div class="hint">⚔ ближний бой · ↗ залп до рукопашной · ♥ здоровье.<br>Копья бьют конницу · конница — стрелков и осадные · стрелки — пехоту · осадные ломают укрепления.</div>';
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-act="uinfo"]');
+    if (el) showUnit(el.dataset.u);
+  });
+
+  // ---------- строения ----------
+  function effText(bid) {
+    var B = CH.BUILDINGS[bid], a = [];
+    if (B.gold) a.push('+' + B.gold + ' зол.'); if (B.glory) a.push('+' + B.glory + ' слава'); if (B.slots) a.push('+' + B.slots + ' найма');
+    if (bid === 'port') a.push('выход в море');
+    return a.join(', ');
+  }
+  function fortText(lv) { return lv > 0 ? CH.FORT_NAMES[lv] + ' (ур. ' + lv + ', −' + Math.round(lv * CH.FORT_DEF * 100) + '% урона)' : ''; }
+  function buildSection(id) {
+    var st = App.st, p = st.provs[id], pl = me(), money = budget();
+    var h = '<div class="sec">Стройка</div>';
+    E.buildingsFor(st, id).forEach(function (bid) {
+      var B = CH.BUILDINGS[bid], built = p.b && p.b[bid], q = queued(id, bid);
+      h += '<div class="bld' + (built ? ' built' : '') + '"><span class="bic" data-act="binfo" data-b="' + bid + '">' + S.img(bid, 4) + '</span>' +
+        '<div class="sp" data-act="binfo" data-b="' + bid + '"><b>' + B.name + '</b><br><small>' + effText(bid) + '</small></div>' +
+        (built ? '<span class="good">✔ есть</span>' : '<button class="btn small ' + (q ? 'on' : 'gold') + '" data-act="build" data-p="' + id + '" data-b="' + bid + '" ' + (!q && money < B.cost ? 'disabled' : '') + '>' + (q ? '✔ ' : '') + B.cost + ' зол.</button>') + '</div>';
+    });
+    var fq = queued(id, 'fort');
+    if (p.walls < CH.MAX_WALLS) {
+      var fc = E.fortCost(pl, p);
+      h += '<div class="bld"><span class="bic" data-act="binfo" data-b="fort">' + S.img('fort', 4) + '</span>' +
+        '<div class="sp" data-act="binfo" data-b="fort"><b>' + CH.FORT_NAMES[p.walls + 1] + '</b><br><small>укрепление ур. ' + p.walls + ' → ' + (p.walls + 1) + '</small></div>' +
+        '<button class="btn small ' + (fq ? 'on' : 'gold') + '" data-act="build" data-p="' + id + '" data-b="fort" ' + (!fq && money < fc ? 'disabled' : '') + '>' + (fq ? '✔ ' : '') + fc + ' зол.</button></div>';
+    } else h += '<div class="bld built"><span class="bic">' + S.img('fort', 4) + '</span><div class="sp"><b>Замок</b><br><small>укрепление ур. 3 — максимум</small></div><span class="good">✔ есть</span></div>';
+    return h + '<div class="hint">Построенное появится в конце раунда, если провинция ещё будет твоей.</div>';
   }
 
   function renderPanel() {
@@ -3195,7 +3556,12 @@ CH.RULES = [
     var ab = CH.ACTIVES[pl.hero.active], h = '';
     h += '<div class="hero-mini">' + S.portrait(pl.hero, 3) + '<div><div class="pt" style="color:' + pl.hero.color + '">' + esc(pl.hero.name) + '</div><div class="sub">' + esc(pl.hero.title) + '</div></div></div>';
     if (!pl.alive) return h + '<div class="ev"><h3>Ты повержен</h3><div class="small">Голова на пике, имя в летописи. Досмотри, кто победит.</div></div>' + standingsMini();
-    h += '<div class="small">Доход: <b>+' + E.income(st, App.you) + '</b> ' + S.img('e_coin', 1) + ' · Слава: <b>+' + E.gloryIncome(st, App.you) + '</b> ' + S.img('e_star', 1) + '/раунд' + (st.mods.famine ? ' <span class="tag judas">неурожай</span>' : '') + (st.mods.mercs ? ' <span class="tag">рыцари −2</span>' : '') + '</div>';
+    var inc = E.income(st, App.you), up = E.upkeep(st, App.you), units = E.playerUnits(st, App.you);
+    h += '<div class="sec">Казна за раунд</div><table class="money"><tr><td>Доход с земель и строений</td><td class="good">+' + inc + '</td></tr>' +
+      '<tr><td>Жалованье войску</td><td class="bad">−' + up + '</td></tr><tr class="tot"><td>Итого</td><td>' + signed(inc - up) + ' ' + S.img('e_coin', 1) + '</td></tr>' +
+      '<tr><td>Слава</td><td>+' + E.gloryIncome(st, App.you) + ' ' + S.img('e_star', 1) + '</td></tr></table>' +
+      (st.mods.famine ? '<span class="tag judas">неурожай: доход вдвое меньше</span>' : '') + (st.mods.mercs ? '<span class="tag">рыцари дешевле на 2</span>' : '');
+    if (E.armyTotal(units)) h += '<div class="sec">Всё войско (' + E.armyTotal(units) + ')</div>' + armyHtml(units);
     var abState = pl.cd > 0 ? 'перезарядка: ' + pl.cd : App.draft.ability != null ? '✔ выбрано' + (App.draft.ability >= 0 ? ': ' + esc(E.provName(st.provs[App.draft.ability])) : '') : 'готово';
     h += '<div class="sec">Способность</div><button class="btn ' + (App.draft.ability != null ? 'on' : 'wood') + ' small abil" data-act="ability" ' + (pl.cd > 0 || App.phase !== 'orders' ? 'disabled' : '') + '>' + esc(ab.name) + ' <span class="small">(' + abState + ')</span></button>';
     h += '<div class="small muted">' + esc(ab.desc) + '</div>';
@@ -3205,8 +3571,8 @@ CH.RULES = [
     if (App.draft.betray) h += '<div class="ev small">🗡 Нож в спину союзнику уже заточен. Сработает в начале исполнения.</div>';
     if (App.phase === 'orders') {
       var nm = App.draft.moves.length, nr = App.draft.recruits.reduce(function (s, r) { return s + r.n; }, 0);
-      h += '<div class="sec">Приказы</div><div class="small">Походов: ' + nm + ' · Найм: ' + nr + ' · Стены: ' + App.draft.builds.length + ' · Остаток: ' + budget() + ' зол.</div>';
-      h += '<div class="hint">Тапни провинцию со своим войском, затем соседнюю — пойдут туда. В городах и столице можно нанимать.</div>';
+      h += '<div class="sec">Приказы</div><div class="small">Походов: ' + nm + ' · Найм: ' + nr + ' · Стройка: ' + App.draft.builds.length + ' · Остаток: ' + budget() + ' зол.</div>';
+      h += '<div class="hint">Тапни провинцию: с войском — отправить в поход, свою — строить и укреплять, город — нанимать.</div>';
     }
     return h + standingsMini();
   }
@@ -3220,10 +3586,15 @@ CH.RULES = [
   }
 
   function provPanel(id) {
-    var st = App.st, p = st.provs[id], pl = me(), tt = T[p.t], h = '';
+    var st = App.st, p = st.provs[id], pl = me(), tt = T[p.t], h = '', land = tt.pass;
     h += '<div class="row"><div class="pt sp">' + esc(E.provName(p)) + '</div><button class="btn tiny ghost" data-act="desel">✕</button></div>';
-    h += '<div class="sub">' + tt.name + (p.owner != null ? ' · ' + nameTag(p.owner) : ' · ничья') + (p.walls ? ' · стены ' + p.walls : '') +
+    h += '<div class="sub">' + tt.name + (land ? (p.owner != null ? ' · ' + nameTag(p.owner) : ' · ничья') : '') +
       (p.plague > 0 ? ' · <span style="color:#9fd86b">☠ чума ' + p.plague + '</span>' : '') + (p.burned > 0 ? ' · 🔥 сожжена' : '') + '</div>';
+    if (land) {
+      var inc = E.provIncome(st, p, p.owner != null ? E.player(st, p.owner) : null), bl = Object.keys(p.b || {});
+      h += '<div class="small">Доход: <b>+' + inc + '</b> ' + S.img('e_coin', 1) + (tt.glory ? ' · слава +' + tt.glory : '') + (p.walls ? '<br>Укрепление: <b>' + fortText(p.walls) + '</b>' : '') +
+        (bl.length ? '<br>Строения: ' + bl.map(function (b) { return S.img(b, 2) + ' ' + CH.BUILDINGS[b].name; }).join(', ') : '') + '</div>';
+    }
     h += '<div class="small muted">' + esc(tt.desc) + '</div>';
     var keys = Object.keys(p.armies);
     if (keys.length) {
@@ -3244,22 +3615,25 @@ CH.RULES = [
         var types = Object.keys(mine).filter(function (k) { return mine[k] > 0; });
         h += '<div class="move ' + (App.focusMove === m ? 'focus' : '') + '"><div class="mvh">→ <b class="sp">' + esc(E.provName(st.provs[m.to])) + '</b>' +
           '<button class="btn tiny ghost" data-act="mvall" data-i="' + i + '">все</button><button class="btn tiny ghost" data-act="mvhalf" data-i="' + i + '">½</button><button class="btn tiny" data-act="mvdel" data-i="' + i + '">✕</button></div>' +
-          types.map(function (k) { return '<span class="step">' + S.unit(k, 2) + '<button class="btn tiny ghost" data-act="mv-" data-i="' + i + '" data-u="' + k + '">−</button><b>' + (m.u[k] || 0) + '</b><button class="btn tiny ghost" data-act="mv+" data-i="' + i + '" data-u="' + k + '">+</button></span>'; }).join('') + '</div>';
+          types.map(function (k) { return '<span class="step c-' + ucls(k) + '">' + S.unit(k, 2) + '<button class="btn tiny ghost" data-act="mv-" data-i="' + i + '" data-u="' + k + '">−</button><b>' + (m.u[k] || 0) + '</b><button class="btn tiny ghost" data-act="mv+" data-i="' + i + '" data-u="' + k + '">+</button></span>'; }).join('') + '</div>';
       });
       h += '<div class="small muted">Остаются на месте: ' + left + '</div>';
+      if (land && E.coastal(st, id) && !(p.b && p.b.port)) h += '<div class="hint">Рядом море. Чтобы уплыть отсюда, нужен порт' + (p.owner === App.you ? ' (см. «Стройка» ниже).' : ' — а провинция не твоя.') + '</div>';
+      if (tt.sea) h += '<div class="hint">В море можно плыть дальше или высадиться на любой берег. Десант в первом бою бьёт на 25% слабее.</div>';
     }
     if (p.owner === App.you && tt.recruit) {
       var slots = E.recruitSlots(st, id), used = slotsUsed(id), money = budget();
       h += '<div class="sec">Найм (' + used + '/' + slots + ' за раунд)</div><div class="rec">' + E.recruitTypes(pl).map(function (u) {
-        var c = E.unitCost(st, pl, u), q = App.draft.recruits.filter(function (r) { return r.p === id && r.u === u; })[0];
-        return '<button class="ru" data-act="rec+" data-p="' + id + '" data-u="' + u + '" ' + (used >= slots || c > money ? 'disabled' : '') + '>' + S.unit(u, 2) + '<span>' + c + '</span>' + (q ? '<span class="q">' + q.n + '</span>' : '') + '</button>';
+        var c = E.unitCost(st, pl, u), q = App.draft.recruits.filter(function (r) { return r.p === id && r.u === u; })[0], x = U[u], dis = used >= slots || c > money;
+        return '<div class="ru c-' + ucls(u) + (dis ? ' dis' : '') + '"><button class="ru-main" data-act="rec+" data-p="' + id + '" data-u="' + u + '" ' + (dis ? 'disabled' : '') + '>' + S.unit(u, 3) +
+          '<span class="ru-t"><b>' + CH.UNIT_UI[u].short + '</b><span>' + c + ' зол.</span><small>⚔' + x.atk + (x.rng ? ' ↗' + x.rng : '') + ' ♥' + x.hp + '</small></span>' +
+          (q ? '<span class="q">' + q.n + '</span>' : '') + '</button><button class="ru-i" data-act="uinfo" data-u="' + u + '">i</button></div>';
       }).join('') + '</div>';
       var qd = App.draft.recruits.filter(function (r) { return r.p === id; });
-      if (qd.length) h += '<div class="queue">' + qd.map(function (r) { return '<div class="qi">' + S.unit(r.u, 1) + ' ' + esc(U[r.u].name) + ' ×' + r.n + (r.u === 'militia' && pl.hero.passive === 'miser' ? ' (×2)' : '') + '<span class="sp"></span><button class="btn tiny ghost" data-act="rec-" data-p="' + id + '" data-u="' + r.u + '">−</button></div>'; }).join('') + '</div>';
-      h += '<div class="hint">Нанятые появятся в конце раунда — если город ещё будет твоим. Тапни иконку в войске, чтобы узнать про отряд.</div>';
-      var wb = App.draft.builds.some(function (b) { return b.p === id; });
-      if (p.walls < CH.MAX_WALLS || wb) h += '<button class="btn small ' + (wb ? 'on' : 'wood') + '" data-act="wall" data-p="' + id + '">Стены ' + p.walls + '→' + (p.walls + 1) + ' (' + E.wallCost(pl) + ' зол.)' + (wb ? ' ✔' : '') + '</button>';
+      if (qd.length) h += '<div class="queue">' + qd.map(function (r) { return '<div class="qi">' + S.unit(r.u, 2) + ' ' + esc(U[r.u].name) + ' ×' + r.n + (r.u === 'militia' && pl.hero.passive === 'miser' ? ' (×2)' : '') + '<span class="sp"></span><button class="btn tiny ghost" data-act="rec-" data-p="' + id + '" data-u="' + r.u + '">−</button></div>'; }).join('') + '</div>';
+      h += classLegend();
     }
+    if (p.owner === App.you && land) h += buildSection(id);
     return h;
   }
 
@@ -3267,8 +3641,12 @@ CH.RULES = [
     var b = e.target.closest('[data-act]'); if (!b) return;
     var act = b.dataset.act, st = App.st, pl = me(), i = +b.dataset.i, mv = App.draft.moves[i];
     switch (act) {
+      case 'uinfo': return;
+      case 'binfo':
+        toast(b.dataset.b === 'fort' ? 'Укрепления: частокол → форт → замок. Каждый уровень — −20% урона по защитникам. Осадная машина врага снимает уровень на время боя.' :
+          CH.BUILDINGS[b.dataset.b].name + ': ' + CH.BUILDINGS[b.dataset.b].desc);
+        return;
       case 'desel': App.sel = null; App.focusMove = null; A.play('click'); renderPanel(); renderTop(); return;
-      case 'uinfo': var u = U[b.dataset.u]; toast(u.name + ' (' + u.cost + ' зол.): ' + unitStats(b.dataset.u) + '. ' + u.desc); return;
       case 'abcancel': App.mode = null; renderPanel(); renderTop(); return;
       case 'ability':
         if (!canOrder() || pl.cd > 0) return;
@@ -3297,12 +3675,14 @@ CH.RULES = [
         var p2 = +b.dataset.p, r2 = App.draft.recruits.filter(function (x) { return x.p === p2 && x.u === b.dataset.u; })[0];
         if (r2) { r2.n--; if (!r2.n) App.draft.recruits.splice(App.draft.recruits.indexOf(r2), 1); }
         A.play('click'); break;
-      case 'wall':
-        var pw = +b.dataset.p, ex = App.draft.builds.filter(function (x) { return x.p === pw; })[0];
-        if (ex) App.draft.builds.splice(App.draft.builds.indexOf(ex), 1);
-        else if (budget() >= E.wallCost(pl)) { App.draft.builds.push({ p: pw }); A.play('coin'); }
-        else { toast('Не хватает золота на стены. Стройте из крестьян?', 'error'); return; }
+      case 'build':
+        var bp = +b.dataset.p, bb = b.dataset.b, ex = queued(bp, bb);
+        if (ex) { App.draft.builds.splice(App.draft.builds.indexOf(ex), 1); A.play('click'); }
+        else if (!E.canBuild(st, App.you, bp, bb)) return;
+        else if (budget() >= E.buildCost(st, pl, st.provs[bp], bb)) { App.draft.builds.push({ p: bp, b: bb }); A.play('coin'); }
+        else { toast('Не хватает золота. Стройте из крестьян?', 'error'); return; }
         break;
+      default: return;
     }
     App.draft.moves = App.draft.moves.filter(function (m) { return E.armyTotal(m.u) > 0; });
     changed();
@@ -3336,12 +3716,14 @@ CH.RULES = [
   // ---------- Итоги раунда ----------
   function closeReport() { var d = $('#report'); if (d) d.remove(); }
   function battleLine(b) {
-    var st = App.st;
-    var side = function (s) { return s.pids.map(function (p) { return p === 'n' ? 'Местные' : esc(heroName(p)); }).join('+') + ' <span class="muted">(−' + E.armyTotal(s.lost) + ' из ' + E.armyTotal(s.before) + ')</span>'; };
-    var w = b.winner;
+    var st = App.st, w = b.winner;
+    var side = function (s, won) {
+      return '<div class="bs' + (won ? ' won' : '') + '">' + s.pids.map(function (p) { return p === 'n' ? 'Местные' : nameTag(p); }).join(' + ') + (won ? ' <span class="good">победа</span>' : '') +
+        '<span class="army inl">' + Object.keys(s.before).map(function (k) { return chip(k, s.before[k], s.lost[k] ? '<small class="lost">−' + s.lost[k] + '</small>' : ''); }).join('') + '</span></div>';
+    };
     var mine = b.sides.some(function (s) { return s.pids.indexOf(App.you) >= 0; });
-    return '<div class="bt ' + (mine ? 'mine' : '') + '">⚔ <b>' + esc(E.provName(st.provs[b.prov])) + '</b>' + (b.field ? ' (в поле)' : '') + ': ' + side(b.sides[0]) + ' ⚔ ' + side(b.sides[1]) +
-      ' → ' + (w < 0 ? 'все полегли' : 'победа: ' + b.sides[w].pids.map(function (p) { return p === 'n' ? 'местных' : esc(heroName(p)); }).join('+')) +
+    return '<div class="bt ' + (mine ? 'mine' : '') + '">⚔ <b>' + esc(E.provName(st.provs[b.prov])) + '</b>' + (b.field ? ' (встречный бой в поле)' : '') + (w < 0 ? ' — все полегли' : '') +
+      side(b.sides[0], w === 0) + side(b.sides[1], w === 1) +
       (b.lines.length ? '<div class="small muted">' + b.lines.map(esc).join(' ') + '</div>' : '') + '</div>';
   }
   function showReport(rep, fresh) {
@@ -3352,7 +3734,7 @@ CH.RULES = [
     var otherB = playerBattles.filter(function (b) { return myB.indexOf(b) < 0 && b.sides.filter(function (s) { return s.pids.some(function (p) { return p !== 'n'; }); }).length > 1; });
     var neutralB = playerBattles.length - myB.length - otherB.length;
     var h = '<div class="row"><h2 class="sp">Летопись: раунд ' + rep.round + '</h2><button class="btn small ghost" data-rep="close">✕</button></div>';
-    if (pl) h += '<div class="small">Тебе: <b>+' + (rep.income[App.you] || 0) + '</b> ' + S.img('e_coin', 1) + ' · <b>' + ((rep.glory[App.you] || 0) >= 0 ? '+' : '') + (rep.glory[App.you] || 0) + '</b> ' + S.img('e_star', 1) + '</div>';
+    if (pl) h += '<div class="small">Тебе за раунд: <b>' + signed(rep.income[App.you] || 0) + '</b> ' + S.img('e_coin', 1) + (rep.upkeep && rep.upkeep[App.you] ? ' <span class="muted">(жалованье −' + rep.upkeep[App.you] + ' уже вычтено)</span>' : '') + ' · <b>' + signed(rep.glory[App.you] || 0) + '</b> ' + S.img('e_star', 1) + '</div>';
     if (rep.event) h += '<div class="ev"><h3>' + esc(rep.event.name) + '</h3><div class="small">' + esc(rep.event.text) + '</div>' + (rep.event.detail ? '<div class="small" style="margin-top:3px"><b>' + esc(rep.event.detail) + '</b></div>' : '') + '</div>';
     if (rep.lines.length) h += '<div class="lines">' + rep.lines.map(function (l) { return '<div>' + esc(l) + '</div>'; }).join('') + '</div>';
     if (myB.length) h += '<div class="sec">Твои битвы</div>' + myB.map(battleLine).join('');
@@ -3480,10 +3862,13 @@ CH.RULES = [
   }
   function showRules() {
     var h = '<h2>Правила</h2>' + CH.RULES.map(function (r) { return '<div class="sec">' + esc(r[0]) + '</div><div class="small" style="line-height:1.4">' + r[1] + '</div>'; }).join('');
+    h += '<div class="sec">Строения</div><table class="utable">' + CH.BUILDING_IDS.map(function (b) {
+      var B = CH.BUILDINGS[b], where = B.on.map(function (t) { return t === 'coast' ? 'любой берег' : T[t].name.toLowerCase(); }).join(', ');
+      return '<tr><td>' + S.img(b, 4) + '</td><td><b>' + B.name + '</b> — ' + B.cost + ' зол. <span class="muted">(' + where + ')</span><br><span class="small muted">' + esc(B.desc) + '</span></td></tr>';
+    }).join('') + '<tr><td>' + S.img('fort', 4) + '</td><td><b>Укрепления</b> — ' + CH.FORT_COST.join(' / ') + ' зол. за уровень<br><span class="small muted">Где: любая своя провинция. Частокол → форт → замок, каждый уровень −20% урона по защитникам.</span></td></tr></table>';
+    h += '<div class="sec">Отряды</div>' + classLegend() + '<div class="small muted">На карте под числом войска — цветная полоска: из кого оно состоит. Тапни значок отряда в любом месте игры, чтобы открыть его карточку.</div>' +
+      CH.BASE_UNITS.concat(CH.UNIQUE_UNITS).map(function (u) { return '<div class="ucard c-' + ucls(u) + '">' + unitCard(u) + '</div>'; }).join('');
     h += '<div class="sec">Местность</div><div class="small">' + Object.keys(T).map(function (k) { return '<b>' + T[k].name + '</b>: ' + esc(T[k].desc); }).join('<br>') + '</div>';
-    h += '<div class="sec">Отряды</div><table class="utable">' + CH.BASE_UNITS.concat(CH.UNIQUE_UNITS).map(function (u) {
-      return '<tr><td>' + S.unit(u, 3) + '</td><td><b>' + esc(U[u].name) + '</b>' + (U[u].unique ? ' <span class="tag">уникальный</span>' : '') + '<br><span class="small">' + U[u].cost + ' зол. · ' + unitStats(u) + '</span><br><span class="small muted">' + esc(U[u].desc) + '</span></td></tr>';
-    }).join('') + '</table>';
     modal(h, { cls: 'frame wide' });
   }
   function showLore() {
@@ -3508,7 +3893,7 @@ CH.RULES = [
       var won = w.pids.indexOf(p.pid) >= 0;
       return '<tr><td>' + S.portrait(p.hero, 2) + '</td><td><b style="color:' + p.hero.color + '">' + esc(p.hero.name) + '</b> ' + (won ? '👑' : '') + (p.judas ? '<span class="tag judas">Иуда</span>' : '') +
         '<div class="small muted">' + esc(App.nicks[p.pid] || '') + (won ? '' : ' — ' + EPITAPHS[(i + st.seed) % EPITAPHS.length]) + '</div></td>' +
-        '<td>' + S.img('e_star', 1) + ' ' + p.glory + '</td><td class="small">земель ' + E.ownedProvs(st, p.pid).length + '<br>убил ' + p.stats.kills + ', потерял ' + p.stats.lost + '</td></tr>';
+        '<td>' + S.img('e_star', 1) + ' ' + p.glory + '</td><td class="small">земель ' + E.ownedProvs(st, p.pid).length + '<br>убил ' + p.stats.kills + ', потерял ' + p.stats.lost + '<br>построил ' + (p.stats.built || 0) + ', награбил ' + (p.stats.loot || 0) + '</td></tr>';
     }).join('');
     var ov = modal((iWon ? '<div class="winbig">ПОБЕДА!</div>' : '<div class="losebig">' + (me() ? 'ПОРАЖЕНИЕ' : 'КОНЕЦ') + '</div>') +
       '<div class="row" style="justify-content:center;margin:6px 0">' + w.pids.map(function (p) { return S.portrait(E.player(st, p).hero, 5); }).join('') + '</div>' +
