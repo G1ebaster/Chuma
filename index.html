@@ -216,7 +216,8 @@ table.money tr.tot td{border-top:1px solid var(--wood2);border-bottom:1px solid 
   body.portrait-ok #panel{width:100%;max-height:45%}
   body.portrait-ok #title{flex-direction:column;overflow:auto}
   body.portrait-ok #lobby{flex-direction:column;overflow:auto}
-  body.portrait-ok #lobby .left{width:100%}
+  body.portrait-ok #lobby .left{width:100%;min-width:0}
+  body.portrait-ok #lobby .left,body.portrait-ok #lobby .right{flex:none;overflow:visible}
   body.portrait-ok .drawer{width:100%}
 }
 @media (max-height:420px){
@@ -225,6 +226,15 @@ table.money tr.tot td{border-top:1px solid var(--wood2);border-bottom:1px solid 
   .btn.big{font-size:16px;padding:9px 16px}
   #title{gap:14px}
 }
+
+/* ---------- v2.1 ---------- */
+.looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2px 12px}
+.lk{display:flex;align-items:center;gap:4px;font-size:13px}
+.lk span{width:118px;color:var(--muted)} .lk b{flex:1;text-align:center;font-weight:600}
+#lobbychat{height:110px}
+.season{display:inline-flex;align-items:center;gap:4px}
+.season .nx{font-size:11px;font-weight:400;color:var(--muted)}
+.seasonbar{display:flex;gap:6px;align-items:center;background:#0004;padding:4px 6px;margin:4px 0;font-size:12.5px;border-left:4px solid var(--gold)}
 
 </style>
 </head>
@@ -240,7 +250,7 @@ table.money tr.tot td{border-top:1px solid var(--wood2);border-bottom:1px solid 
 var CH = (typeof globalThis !== 'undefined' ? globalThis : window).CH || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).CH = CH;
 
-CH.VERSION = '2.0';
+CH.VERSION = '2.1';
 
 // ---------- Местность ----------
 CH.TERRAIN = {
@@ -284,6 +294,54 @@ CH.UNITS = {
 };
 CH.BASE_UNITS = ['militia', 'spear', 'archer', 'knight', 'bombard', 'trebuchet'];
 CH.UNIQUE_UNITS = ['genoese', 'horsearch', 'ushkuy', 'ordknight'];
+// ---------- Карты ----------
+CH.MAPS = {
+  continent: { name: 'Материк',         desc: 'Суша посередине, море вокруг. Классика.' },
+  islands:   { name: 'Архипелаг',       desc: 'Острова и узкие перешейки. Порт — лучший друг, перешеек — лучшая ловушка.' },
+  midsea:    { name: 'Срединное море',  desc: 'Земли кольцом вокруг моря. Напрямик к соседу — только вплавь.' },
+  mountains: { name: 'Горные перевалы', desc: 'Хребты и узкие проходы. Кто держит перевал, тот держит всё.' },
+  steppe:    { name: 'Великая степь',   desc: 'Ровно и пусто. Спрятаться негде, бежать далеко.' },
+  forest:    { name: 'Дремучие леса',   desc: 'Леса и болота. Защищаться легко, наступать тошно.' }
+};
+CH.MAP_IDS = Object.keys(CH.MAPS);
+
+// ---------- Времена года: раунд = сезон, по кругу ----------
+CH.SEASONS = [
+  { id: 'summer', name: 'Лето',  short: 'нападающие бьют на 15% сильнее',
+    desc: 'Пора походов: нападающие бьют на 15% сильнее. Дороги сухие, совесть тоже.' },
+  { id: 'autumn', name: 'Осень', short: 'доход +50%',
+    desc: 'Урожай собран, подати тоже: доход с земель и строений +50%.' },
+  { id: 'winter', name: 'Зима',  short: 'доход вдвое меньше, нападающие −25%',
+    desc: 'Мороз: доход вдвое меньше, нападающие бьют на 25% слабее. Умные сидят дома, остальные — в летописи.' },
+  { id: 'spring', name: 'Весна', short: '+2 места найма, конница и осадные −25%',
+    desc: 'Распутица: конница и осадные бьют на 25% слабее. Зато весенний призыв: +2 места найма в каждом городе и столице.' }
+];
+CH.seasonOf = function (round) { return ((round - 1) % 4 + 4) % 4; };
+
+// ---------- Приданое: стартовый бонус героя ----------
+CH.PERKS = {
+  chest:    { name: 'Сундук',   desc: '+8 золота на старте. Происхождение денег лучше не уточнять.' },
+  guard:    { name: 'Дружина',  desc: '+2 копейщика и +2 лучника в столице. Верны, пока платят.' },
+  mason:    { name: 'Каменщик', desc: 'Столица сразу с Замком (укрепление ур. 3) и Казармами. Строили пленные, охотно.' },
+  merchant: { name: 'Купец',    desc: 'В столице уже стоит Рынок: +3 золота за раунд.' },
+  relic:    { name: 'Реликвия', desc: '+8 славы на старте. Палец святого. Шестой с одной руки.' },
+  mob:      { name: 'Толпа',    desc: '+7 ополченцев в столице. Вилы свои.' }
+};
+CH.PERK_IDS = Object.keys(CH.PERKS);
+
+// ---------- Внешность своего героя ----------
+CH.LOOK = {
+  skin:  { name: 'Кожа',    n: 6, names: ['обычная', 'бледная', 'загорелая', 'смуглая', 'чумная', 'покойницкая'] },
+  hair:  { name: 'Причёска', n: 4, names: ['лысый', 'короткая', 'длинная', 'тонзура'] },
+  hairc: { name: 'Цвет волос', n: 6, names: ['чёрные', 'русые', 'светлые', 'рыжие', 'седые', 'белые'] },
+  beard: { name: 'Борода',  n: 4, names: ['нет', 'усы', 'бородка', 'борода лопатой'] },
+  hat:   { name: 'Головной убор', n: 9, names: ['нет', 'корона', 'шлем', 'капюшон', 'меховая шапка', 'митра', 'тюрбан', 'соломенная шляпа', 'рогатый шлем'] },
+  extra: { name: 'Особая примета', n: 5, names: ['нет', 'повязка на глазу', 'шрам', 'маска чумного доктора', 'боевая раскраска'] }
+};
+CH.LOOK_KEYS = ['skin', 'hair', 'hairc', 'beard', 'hat', 'extra'];
+CH.SKIN = [['#f2c79a', '#c99067'], ['#f7dcc0', '#d9b08c'], ['#c98d5e', '#9a6238'], ['#8a5a3a', '#5e3a22'], ['#9fbf7a', '#6f8f4a'], ['#c9c9d6', '#9a9aa8']];
+CH.HAIRC = [['#2b2019', '#15100c'], ['#6b4423', '#4a2d15'], ['#d9b24a', '#a8862f'], ['#b5451b', '#7e2d10'], ['#b8b8b8', '#8a8a8a'], ['#f0f0f0', '#c4c4c4']];
+
 CH.ROUND_OPTS = [10, 12, 15, 20, 25, 30];
 CH.TIME_OPTS = [40, 50, 60, 75, 90, 120];           // секунд на приказы в 1-м раунде; к последнему — вдвое больше
 CH.roundTime = function (base, round, maxRounds) {
@@ -341,10 +399,10 @@ CH.BUILDING_IDS = Object.keys(CH.BUILDINGS);
 
 // ---------- Способности ----------
 CH.PASSIVES = {
-  usury:      { name: 'Ростовщик',     desc: '+15% дохода. Деньги не пахнут. Пахнут те, кто не вернул долг.' },
-  horde:      { name: 'Орда',          desc: 'Конница дешевле на 1, бьёт на 25% сильнее и не просит жалованья: кормится в походе, за чужой счёт.' },
-  motherland: { name: 'Глубокий снег', desc: 'В своих провинциях враг наносит на 25% меньше урона. Генерал Мороз тоже на зарплате.' },
-  ordnung:    { name: 'Орднунг',       desc: 'Укрепления за полцены. +1 слава за каждый монастырь и каждую столицу каждый раунд.' },
+  usury:      { name: 'Ростовщик',     desc: '+13% дохода. Деньги не пахнут. Пахнут те, кто не вернул долг.' },
+  horde:      { name: 'Орда',          desc: 'Конница дешевле на 1, бьёт на 30% сильнее, не просит жалованья и не вязнет в весенней грязи.' },
+  motherland: { name: 'Глубокий снег', desc: 'В своих провинциях враг наносит на 30% меньше урона, а зимой — на 45%. Свои войска зимой наступают без штрафа: привычные.' },
+  ordnung:    { name: 'Орднунг',       desc: 'Укрепления на 40% дешевле. +1 слава за каждый монастырь и за свою столицу каждый раунд.' },
   pious:      { name: 'Святоша',       desc: '+1 слава каждый раунд. Бог всё видит, но смотрит в другую сторону.' },
   butcher:    { name: 'Палач',         desc: '+1 слава за каждую выигранную битву. Публичные казни поднимают рейтинг.' },
   miser:      { name: 'Скупердяй',     desc: 'Найм ополчения даёт двоих по цене одного. Крестьян много, ценность их — соответствующая.' }
@@ -353,12 +411,12 @@ CH.PASSIVES = {
 CH.ACTIVES = {
   poison:     { name: 'Яд в бокале', cd: 4, target: 'enemyArmy',
                 desc: 'Выбери провинцию с чужой армией: она теряет 35% войск. В бокале было вино. И ещё кое-что.' },
-  plaguegift: { name: 'Чумной подарок', cd: 4, target: 'near2',
+  plaguegift: { name: 'Чумной подарок', cd: 3, target: 'near2',
                 desc: 'Заразить чумой провинцию в 2 шагах от твоих земель. Под Кафой в 1346 году так и сделали — история лучший учитель.' },
   muzhiki:    { name: 'Мужики, подъём!', cd: 3, target: 'ownRecruit',
                 desc: 'Бесплатно призвать 7 ополченцев (+1 за каждые 3 раунда) в свой город или столицу. Прямо сейчас, до боя.' },
-  crusade:    { name: 'Крестовый поход', cd: 4, target: 'none',
-                desc: 'В этом раунде все твои войска бьют на 40% сильнее. Захваченное сжигается: раунд без дохода. Зато весело.' },
+  crusade:    { name: 'Крестовый поход', cd: 5, target: 'none',
+                desc: 'В этом раунде все твои войска бьют на 25% сильнее. Захваченное сжигается: раунд без дохода. Зато весело.' },
   bribe:      { name: 'Подкуп', cd: 3, target: 'neutralAdj', cost: 6,
                 desc: 'За 6 золота нейтральная провинция рядом с тобой становится твоей. Гарнизон ушёл на пенсию. Навсегда.' },
   execution:  { name: 'Показательная казнь', cd: 3, target: 'none',
@@ -397,8 +455,8 @@ CH.HEROES = {
   }
 };
 CH.HERO_ORDER = ['antonio', 'petr', 'klim', 'wulf'];
-CH.CUSTOM_COLORS = ['#a35bd6', '#1fb39a', '#ef77b6', '#9a6634', '#9acd32', '#4a4a4a', '#ff8a3d', '#5fd0ff'];
-CH.EMBLEMS = ['skull', 'crown', 'sword', 'axe', 'moon', 'star', 'cross', 'coin', 'horse', 'bear'];
+CH.CUSTOM_COLORS = ['#a35bd6', '#1fb39a', '#ef77b6', '#9a6634', '#9acd32', '#4a4a4a', '#ff8a3d', '#5fd0ff', '#2e8b57', '#8b1a2b', '#c9c36a', '#7d7dff'];
+CH.EMBLEMS = ['skull', 'crown', 'sword', 'axe', 'moon', 'star', 'cross', 'coin', 'horse', 'bear', 'tower', 'heart', 'fish', 'rat'];
 
 // ---------- Тайные задания ----------
 CH.QUESTS = {
@@ -544,6 +602,9 @@ CH.RULES = [
   ['Море', 'Построй <b>порт</b> на берегу — и войска из этой провинции смогут выйти в море. По морю плаваешь свободно, высаживаться можно на любой берег. На воде все бьются на 25% хуже, десант в первом бою — тоже.'],
   ['Деньги', 'Провинции и строения дают золото каждый раунд. Войску нужно <b>жалованье</b>: 1 золото за каждых 3 воинов (ополчение служит бесплатно). Нечем платить — воины дезертируют. Захват чужой провинции приносит <b>добычу</b>, а взятие столицы — половину казны врага.'],
   ['Слава', 'Города, монастыри, столицы и соборы дают славу каждый раунд. Ещё слава за победы в битвах с игроками (+1, против вдвое сильного +2), взятие чужой столицы (+5) и тайные задания (+4).'],
+  ['Времена года', 'Каждый раунд — новый сезон, по кругу: <b>лето</b> (нападающие бьют на 15% сильнее), <b>осень</b> (доход +50%), <b>зима</b> (доход вдвое меньше, нападающие бьют на 25% слабее), <b>весна</b> (конница и осадные −25%, зато +2 места найма). Текущий и следующий сезон видны вверху экрана.'],
+  ['Карты', 'Хост выбирает тип карты: материк, архипелаг, срединное море, горные перевалы, великая степь, дремучие леса — или случайную.'],
+  ['Приданое', 'Перед игрой каждый выбирает герою стартовый бонус: сундук золота, дружину, замок, рынок, реликвию или толпу ополченцев.'],
   ['Выбывание', 'Претендент выбывает, если у него не осталось войска и нет ни одного города или столицы, где можно нанять новое. Его земли становятся ничьими.'],
   ['Дипломатия', 'Союзы: союзники не дерутся, могут стоять в провинциях друг друга и вместе брать столицы. Можно честно разорвать союз (сработает в конце раунда) или <b>предать</b>: нож в спину сработает в начале боя, +3 славы и +50% атаки против бывшего союзника. Можно дарить золото.'],
   ['Герой', 'У каждого героя пассивка, активная способность (с перезарядкой) и уникальный отряд. Способность выбирается в панели героя и срабатывает в начале исполнения приказов.'],
@@ -627,25 +688,29 @@ CH.RULES = [
     }
   }
 
-  function genMap(n, rng) {
+  var MAPW = {
+    continent: { plain: 30, forest: 22, hills: 13, swamp: 6, village: 15, mountain: 5, water: 3 },
+    islands:   { plain: 30, forest: 22, hills: 13, swamp: 4, village: 18, mountain: 3, water: 0 },
+    midsea:    { plain: 30, forest: 22, hills: 13, swamp: 5, village: 16, mountain: 5, water: 1 },
+    mountains: { plain: 22, forest: 17, hills: 21, swamp: 2, village: 14, mountain: 14, water: 2 },
+    steppe:    { plain: 54, forest: 6, hills: 9, swamp: 3, village: 17, mountain: 1, water: 2 },
+    forest:    { plain: 13, forest: 45, hills: 7, swamp: 13, village: 13, mountain: 3, water: 4 }
+  };
+  function genMap(n, rng, type) {
     var size = n <= 2 ? [11, 8] : n === 3 ? [12, 8] : n === 4 ? [14, 9] : n === 5 ? [15, 9] : n === 6 ? [16, 10] : [17, 10];
     var cols = size[0], rows = size[1], N = cols * rows, i, j;
     var adj = []; for (i = 0; i < N; i++) adj.push(neighborsRaw(cols, rows, i));
-    var t = [];
-    var W = { plain: 30, forest: 22, hills: 13, swamp: 6, village: 15, mountain: 5, water: 3 };
+    var t = [], W = MAPW[type] || MAPW.continent;
     function ring(i) { var c = i % cols, r = Math.floor(i / cols); return Math.min(c, r, cols - 1 - c, rows - 1 - r); }
-    for (i = 0; i < N; i++) {
-      var rg = ring(i);
-      t[i] = rg === 0 ? 'water' : rg === 1 && rng() < 0.2 ? 'water' : weighted(rng, W);
-    }
-    // столицы — по эллипсу
+    // столицы — по эллипсу (от местности не зависят)
     var centers = []; for (i = 0; i < N; i++) centers.push(E.hexCenter(cols, i));
     var mw = Math.sqrt(3) * (cols + 0.5), mh = 1.5 * (rows - 1) + 2;
     var cx = mw / 2, cy = mh / 2, start = rng() * Math.PI * 2;
+    var ex = type === 'midsea' ? 0.42 : 0.33, ey = type === 'midsea' ? 0.4 : 0.3;
     var caps = [];
     for (j = 0; j < n; j++) {
       var a = start + j * Math.PI * 2 / n;
-      var tx = cx + Math.cos(a) * mw * 0.33, ty = cy + Math.sin(a) * mh * 0.3;
+      var tx = cx + Math.cos(a) * mw * ex, ty = cy + Math.sin(a) * mh * ey;
       var best = -1, bd = 1e9;
       for (i = 0; i < N; i++) {
         if (ring(i) < 2) continue;
@@ -655,26 +720,68 @@ CH.RULES = [
       }
       caps.push(best);
     }
+    // острова для архипелага: вокруг столиц и ещё несколько ничьих
+    var isles = [];
+    if (type === 'islands') {
+      caps.forEach(function (k) { isles.push([k, 2, 0.7]); });
+      var want = n + 5, guard0 = 0;
+      while (want > 0 && guard0++ < 600) {
+        var c0 = Math.floor(rng() * N);
+        if (ring(c0) < 2 || isles.some(function (s) { return hexDist(cols, s[0], c0) < s[1] + 2; })) continue;
+        isles.push([c0, 1, 0.75]); want--;
+      }
+    }
+    for (i = 0; i < N; i++) {
+      var rg = ring(i), land = true;
+      if (rg === 0) land = false;
+      else if (type === 'islands') {
+        land = isles.some(function (s) { var dd = hexDist(cols, s[0], i); return dd <= s[1] - 1 || (dd === s[1] && rng() < s[2]); });
+      } else if (type === 'midsea') {
+        var nx = (centers[i][0] - cx) / (mw * 0.5), ny = (centers[i][1] - cy) / (mh * 0.5);
+        land = Math.sqrt(nx * nx + ny * ny) > 0.36 + (rng() - 0.5) * 0.14 && !(rg === 1 && rng() < 0.1);
+      } else land = !(rg === 1 && rng() < (type === 'continent' ? 0.2 : 0.12));
+      t[i] = land ? weighted(rng, W) : 'water';
+    }
+    // горные хребты
+    if (type === 'mountains') {
+      for (var rdg = 0; rdg < (n <= 4 ? 2 : 3); rdg++) {
+        var horiz = rng() < 0.5, pos = 2 + Math.floor(rng() * ((horiz ? rows : cols) - 4));
+        for (var s2 = 1; s2 < (horiz ? cols : rows) - 1; s2++) {
+          var id2 = horiz ? pos * cols + s2 : s2 * cols + pos;
+          if (ring(id2) > 0 && rng() < 0.85) t[id2] = 'mountain';
+          var drift = rng(); if (drift < 0.3) pos--; else if (drift > 0.7) pos++;
+          pos = Math.max(1, Math.min((horiz ? rows : cols) - 2, pos));
+        }
+      }
+    }
     caps.forEach(function (k) {
       t[k] = 'capital';
       var vill = false;
       shuffle(rng, adj[k].slice()).forEach(function (m) {
-        if (t[m] === 'capital') return;
+        if (t[m] === 'capital' || ring(m) === 0) return;
         if (!vill) { t[m] = 'village'; vill = true; }
         else if (!T[t[m]].pass || t[m] === 'swamp' || t[m] === 'city') t[m] = rng() < 0.5 ? 'plain' : 'forest';
       });
     });
-    // проходы между столицами
+    // сухопутные проходы между столицами: ищем путь, где меньше всего придётся прорубать
     function carve(a, b) {
-      var cur = a, guard = 0;
-      while (cur !== b && guard++ < 100) {
-        var nb = adj[cur], best = nb[0], bd = 1e9;
-        nb.forEach(function (m) { if (ring(m) === 0) return; var d = hexDist(cols, m, b) + rng() * 0.5; if (d < bd) { bd = d; best = m; } });
-        cur = best;
-        if (!T[t[cur]].pass) t[cur] = 'plain';
+      var dist = {}, prev = {}, open = [a]; dist[a] = 0;
+      while (open.length) {
+        var bi = 0; for (var q0 = 1; q0 < open.length; q0++) if (dist[open[q0]] < dist[open[bi]]) bi = q0;
+        var cur = open.splice(bi, 1)[0];
+        if (cur === b) break;
+        adj[cur].forEach(function (m) {
+          if (ring(m) === 0) return;
+          var c = dist[cur] + (T[t[m]].pass ? 1 : 6) + rng() * 0.3;
+          if (dist[m] === undefined || c < dist[m]) { if (dist[m] === undefined) open.push(m); dist[m] = c; prev[m] = cur; }
+        });
+      }
+      for (var x = b; x !== undefined && x !== a; x = prev[x]) {
+        if (!T[t[x]].pass) t[x] = t[x] === 'mountain' ? 'hills' : (rng() < 0.3 ? 'swamp' : 'plain');
       }
     }
-    for (j = 0; j < n; j++) carve(caps[j], caps[(j + 1) % n]);
+    // на архипелаге перешейки только между парами островов, остальное — морем
+    for (j = 0; j < n; j++) if (type !== 'islands' || (j % 2 === 0 && j + 1 < n)) carve(caps[j], caps[(j + 1) % n]);
     // города
     var cities = [];
     function okCity(i, minCap) {
@@ -711,7 +818,14 @@ CH.RULES = [
     // связность
     var seen = {}, q = [caps[0]]; seen[caps[0]] = 1;
     while (q.length) { var x = q.shift(); adj[x].forEach(function (m) { if (!seen[m] && T[t[m]].pass) { seen[m] = 1; q.push(m); } }); }
-    for (i = 0; i < N; i++) if (T[t[i]].pass && !seen[i]) t[i] = adj[i].some(function (m) { return t[m] === 'water'; }) ? 'water' : 'mountain';
+    if (type === 'islands') caps.forEach(function (k) { if (!seen[k]) { seen[k] = 1; q.push(k); } });
+    while (q.length) { var x2 = q.shift(); adj[x2].forEach(function (m) { if (!seen[m] && T[t[m]].pass) { seen[m] = 1; q.push(m); } }); }
+    // отрезанная суша: на архипелаге остаётся островом (если есть берег), иначе — в горы/воду
+    for (i = 0; i < N; i++) if (T[t[i]].pass && !seen[i]) {
+      var coastal = adj[i].some(function (m) { return t[m] === 'water'; });
+      if (type === 'islands' && coastal) continue;
+      t[i] = coastal ? 'water' : 'mountain';
+    }
     for (i = 0; i < N; i++) if (ring(i) === 0) t[i] = 'water';
     // названия
     var pools = {};
@@ -729,19 +843,28 @@ CH.RULES = [
       if (T[tt].pass && tt !== 'capital') p.armies.n = garrison(tt, rng);
       provs.push(p);
     }
-    return { cols: cols, rows: rows, adj: adj, provs: provs, caps: caps };
+    return { cols: cols, rows: rows, adj: adj, provs: provs, caps: caps, type: type };
   }
 
   // ---------- Новая игра ----------
-  E.heroSpec = function (heroId, custom) {
+  E.cleanLook = function (l) {
+    if (!l || typeof l !== 'object') return null;
+    var out = {}; CH.LOOK_KEYS.forEach(function (k) { var v = Math.floor(Number(l[k]) || 0); out[k] = Math.max(0, Math.min(CH.LOOK[k].n - 1, v)); });
+    return out;
+  };
+  function cleanMotto(s) { return String(s || '').replace(/\s+/g, ' ').trim().slice(0, 60); }
+  // opt: {perk, motto} — для готовых героев; у своих героев это лежит прямо в custom
+  E.heroSpec = function (heroId, custom, opt) {
+    opt = opt || {};
     if (heroId && CH.HEROES[heroId]) {
       var h = CH.HEROES[heroId];
       return { id: heroId, name: h.name, title: h.title, color: h.color, emblem: h.emblem, capitalName: h.capitalName,
-               passive: h.passive, active: h.active, unique: h.unique };
+               passive: h.passive, active: h.active, unique: h.unique,
+               perk: CH.PERKS[opt.perk] ? opt.perk : null, motto: cleanMotto(opt.motto) };
     }
     var c = custom || {};
-    return { id: 'custom', name: (c.name || 'Безымянный').slice(0, 18), title: (c.title || 'Самозванец').slice(0, 40),
-             color: c.color || '#a35bd6', emblem: c.emblem || 'skull',
+    return { look: E.cleanLook(c.look), perk: CH.PERKS[c.perk] ? c.perk : null, motto: cleanMotto(c.motto), id: 'custom', name: (c.name || 'Безымянный').slice(0, 18), title: (c.title || 'Самозванец').slice(0, 40),
+             color: /^#[0-9a-f]{6}$/i.test(c.color || '') ? c.color : '#a35bd6', emblem: CH.EMBLEMS.indexOf(c.emblem) >= 0 ? c.emblem : 'skull',
              capitalName: c.capitalName || ('Твердыня ' + (c.name || 'Самозванца')).slice(0, 24),
              passive: CH.PASSIVES[c.passive] ? c.passive : 'pious',
              active: CH.ACTIVES[c.active] ? c.active : 'execution',
@@ -753,7 +876,8 @@ CH.RULES = [
     var seed = opts.seed != null ? opts.seed : Math.floor(Math.random() * 1e9);
     var rng = rngFrom(seed);
     var n = lobby.length;
-    var m = genMap(n, rng);
+    var mapType = CH.MAPS[opts.map] ? opts.map : pick(rng, CH.MAP_IDS);
+    var m = genMap(n, rng, mapType);
     var order = shuffle(rng, lobby.map(function (_, i) { return i; }));
     var questIds = Object.keys(CH.QUESTS);
     var players = lobby.map(function (lp, idx) {
@@ -762,14 +886,23 @@ CH.RULES = [
       var prov = m.provs[cap];
       prov.owner = lp.pid; prov.name = hero.capitalName;
       var army = { militia: 4, spear: 2, archer: 2 }; army[hero.unique] = 1;
+      var gold0 = CH.START_GOLD, glory0 = 0;
+      switch (hero.perk) {
+        case 'chest': gold0 += 8; break;
+        case 'guard': army.spear += 2; army.archer += 2; break;
+        case 'mason': prov.walls = CH.MAX_WALLS; prov.b.barracks = 1; break;
+        case 'merchant': prov.b.market = 1; break;
+        case 'relic': glory0 = 8; break;
+        case 'mob': army.militia += 7; break;
+      }
       prov.armies = {}; prov.armies[lp.pid] = army;
       var qs = shuffle(rng, questIds.slice()).slice(0, 2).map(function (q) { return { id: q, done: false }; });
-      return { pid: lp.pid, nick: lp.nick || hero.name, bot: !!lp.bot, hero: hero, gold: CH.START_GOLD, glory: 0, capital: cap,
+      return { pid: lp.pid, nick: lp.nick || hero.name, bot: !!lp.bot, hero: hero, gold: gold0, glory: glory0, capital: cap,
                alive: true, cd: 0, quests: qs, judas: false,
                stats: { kills: 0, lost: 0, won: 0, caps: 0, peakProvs: 1, betrayals: 0, built: 0, loot: 0 } };
     });
     var st = {
-      v: 2, seed: seed, rs: rng.seed(), round: 1, maxRounds: opts.rounds || 20, phase: 'orders',
+      v: 3, map: mapType, seed: seed, rs: rng.seed(), round: 1, maxRounds: opts.rounds || 20, phase: 'orders',
       cols: m.cols, rows: m.rows, adj: m.adj, provs: m.provs, capitals: m.caps.slice(),
       players: players, alliances: [], breaks: [], mods: {}, lastEvent: null, winner: null, nStart: n,
       history: []
@@ -797,6 +930,7 @@ CH.RULES = [
     if (st.mods.mercs && type === 'knight') c -= 2;
     return Math.max(1, c);
   };
+  E.season = function (st) { return CH.SEASONS[CH.seasonOf(st.round)]; };
   E.isSea = function (st, id) { return !!T[st.provs[id].t].sea; };
   E.coastal = function (st, id) { return T[st.provs[id].t].pass && st.adj[id].some(function (m) { return T[st.provs[m].t].sea; }); };
   // Можно ли отдать приказ идти из from в to
@@ -808,7 +942,7 @@ CH.RULES = [
     if (T[a.t].sea) return true;
     return !!(a.b && a.b.port) && a.owner != null && E.allied(st, pid, a.owner);
   };
-  E.fortCost = function (pl, prov) { var c = CH.FORT_COST[prov.walls] || 0; return pl.hero.passive === 'ordnung' ? Math.ceil(c / 2) : c; };
+  E.fortCost = function (pl, prov) { var c = CH.FORT_COST[prov.walls] || 0; return pl.hero.passive === 'ordnung' ? Math.ceil(c * 0.6) : c; };
   E.buildCost = function (st, pl, prov, b) { return b === 'fort' ? E.fortCost(pl, prov) : CH.BUILDINGS[b].cost; };
   E.canBuild = function (st, pid, id, b) {
     var p = st.provs[id]; if (!p || p.owner !== pid || !T[p.t].pass) return false;
@@ -832,7 +966,7 @@ CH.RULES = [
     return Math.floor(n / CH.UPKEEP_PER);
   };
   E.recruitTypes = function (pl) { return CH.BASE_UNITS.concat([pl.hero.unique]); };
-  E.recruitSlots = function (st, id) { var p = st.provs[id], s = T[p.t].recruit || 0; return s ? s + (p.b && p.b.barracks ? CH.BUILDINGS.barracks.slots : 0) : 0; };
+  E.recruitSlots = function (st, id) { var p = st.provs[id], s = T[p.t].recruit || 0; return s ? s + (p.b && p.b.barracks ? CH.BUILDINGS.barracks.slots : 0) + (E.season(st).id === 'spring' ? 2 : 0) : 0; };
   E.armyTotal = function (a) { var s = 0; if (a) for (var k in a) s += a[k]; return s; };
   E.power = function (a) {
     var s = 0; if (!a) return 0;
@@ -843,7 +977,9 @@ CH.RULES = [
   E.income = function (st, pid, ignoreMods) {
     var pl = P(st, pid), inc = 0;
     st.provs.forEach(function (p) { if (p.owner === pid && !(p.plague > 0) && !p.burned) inc += E.provIncome(st, p, pl); });
-    if (pl.hero.passive === 'usury') inc = Math.round(inc * 1.15);
+    if (pl.hero.passive === 'usury') inc = Math.round(inc * 1.13);
+    var sea0 = E.season(st).id;
+    if (sea0 === 'autumn') inc = Math.round(inc * 1.5); else if (sea0 === 'winter') inc = Math.floor(inc / 2);
     if (!ignoreMods && st.mods.famine) inc = Math.floor(inc / 2);
     return inc;
   };
@@ -852,7 +988,7 @@ CH.RULES = [
     st.provs.forEach(function (p) {
       if (p.owner !== pid) return;
       g += T[p.t].glory;
-      if (pl.hero.passive === 'ordnung' && (p.t === 'monastery' || p.t === 'capital')) g += 1;
+      if (pl.hero.passive === 'ordnung' && (p.t === 'monastery' || p.id === pl.capital)) g += 1;
       for (var k in p.b) g += CH.BUILDINGS[k].glory || 0;
     });
     if (pl.hero.passive === 'pious') g += 1;
@@ -970,12 +1106,14 @@ CH.RULES = [
     function atkMult(x, si, phase) {
       var m = 1, pl = x.pid !== 'n' ? P(st, x.pid) : null, u = U[x.type];
       if (pl) {
-        if (ctx.fx.crusade[x.pid]) m *= 1.4;
-        if (pl.hero.passive === 'horde' && u.tags.indexOf('cav') >= 0) m *= 1.25;
+        if (ctx.fx.crusade[x.pid]) m *= 1.25;
+        if (pl.hero.passive === 'horde' && u.tags.indexOf('cav') >= 0) m *= 1.3;
         var vict = ctx.fx.betray[x.pid];
         if (vict && pids[1 - si].some(function (v) { return vict.indexOf(v) >= 0; })) m *= 1.5;
       }
       if (terr === 'swamp' || terr === 'water') m *= 0.75;
+      if (!sides[si].def) { if (ctx.season === 'summer') m *= 1.15; else if (ctx.season === 'winter' && !(pl && pl.hero.passive === 'motherland')) m *= 0.75; }
+      if (ctx.season === 'spring' && (u.tags.indexOf('siege') >= 0 || (u.tags.indexOf('cav') >= 0 && !(pl && pl.hero.passive === 'horde')))) m *= 0.75;
       if (prov && ctx.landing && ctx.landing[x.pid] && !sides[si].def) m *= 0.75;
       if (prov && terr === 'forest' && !sides[si].def && u.tags.indexOf('cav') >= 0) m *= 0.8;
       if (prov && terr === 'hills' && sides[si].def && phase === 'rng') m *= 1.25;
@@ -988,7 +1126,7 @@ CH.RULES = [
       var leff = Math.max(0, walls - siegeCount(sides[1 - si]));
       m *= (1 - CH.FORT_DEF * leff);
       var owner = prov.owner && prov.owner !== 'n' ? P(st, prov.owner) : null;
-      if (owner && owner.hero.passive === 'motherland' && pids[si].indexOf(prov.owner) >= 0) m *= 0.75;
+      if (owner && owner.hero.passive === 'motherland' && pids[si].indexOf(prov.owner) >= 0) m *= ctx.season === 'winter' ? 0.55 : 0.7;
       return m;
     }
     var done = false;
@@ -1083,7 +1221,8 @@ CH.RULES = [
     var rep = { round: st.round, moves: [], battles: [], captures: [], lines: [], groans: [], quests: [], event: null,
                 abilities: [], eliminated: [], plague: [], income: {}, glory: {} };
     var fx = { crusade: {}, betray: {} };
-    var ctx = { st: st, rng: rng, fx: fx, rep: rep, landing: null };
+    var ctx = { st: st, rng: rng, fx: fx, rep: rep, landing: null, season: E.season(st).id };
+    rep.season = CH.seasonOf(st.round);
     rep.upkeep = {};
     var alive = st.players.filter(function (p) { return p.alive; });
     var gloryBefore = {}; st.players.forEach(function (p) { gloryBefore[p.pid] = p.glory; });
@@ -1648,7 +1787,7 @@ CH.RULES = [
         var n = st.provs[m]; if (!T[n.t].pass) return;
         var v = value(st, pid, n); if (v <= 0) return;
         var hp = hostilePower(st, pid, n) * (1 + (T[n.t].def || 0) + 0.3 * n.walls);
-        if (myP > hp * 1.35 + 0.5) { var sc = v / (1 + hp * 0.1) + rng(); if (sc > bs) { bs = sc; best = m; } }
+        if (myP > hp * (E.season(st).id === 'winter' ? 1.7 : 1.35) + 0.5) { var sc = v / (1 + hp * 0.1) + rng(); if (sc > bs) { bs = sc; best = m; } }
       });
       var keep = (p.t === 'capital' || p.t === 'city') && threat > 0 ? 0.35 : 0;
       if (best != null) {
@@ -1796,6 +1935,15 @@ CH.RULES = [
     e_coin: ['..yyyyy..', '.yYYYYYy.', 'yYyyyyyYy', 'yYyYYYyYy', 'yYyYyyyYy', 'yYyYYyyYy', '.yYyYyYy.', '..yyyyy..', '.........'],
     e_horse: ['...bb.b..', '..bbbbb..', '.bbkbbbb.', 'bbbbbbbbb', 'bb..bbbb.', '....bbbb.', '...bbbbb.', '..bbbbbb.', '..bbbbbb.'],
     e_bear: ['bb.....bb', 'bbbbbbbbb', '.bbbbbbb.', '.bkbbbkb.', '.bbbbbbb.', '.bbsssbb.', '..bskSb..', '..bbbbb..', '.........'],
+    e_tower: ['.q.q.q.q.', '.qqqqqqq.', '.qqqqqqq.', '..qqqqq..', '..qqkqq..', '..qqkqq..', '..qqqqq..', '.qqqqqqq.', '.qqqqqqq.'],
+    e_heart: ['.........', '.qq...qq.', 'qqqq.qqqq', 'qqqqqqqqq', 'qqqqqqqqq', '.qqqqqqq.', '..qqqqq..', '...qqq...', '....q....'],
+    e_fish: ['.........', '...qqq...', 'q.qqqqqq.', 'qqqqqqkqq', 'qqqqqqqqq', 'q.qqqqqq.', '...qqq...', '.........', '.........'],
+    e_rat: ['.........', '.....qq..', '....qqqq.', '..qqqqkqq', '.qqqqqqq.', 'qqqqqqq..', 'q.q...q..', 'q........', '.qq......'],
+    // ---- времена года 7x7 ----
+    s_summer: ['y..y..y', '.yyyyy.', '.yyyyy.', 'yyyyyyy', '.yyyyy.', '.yyyyy.', 'y..y..y'],
+    s_autumn: ['....oo.', '..oooo.', '.oooyo.', '.ooyoo.', 'ooyooo.', '.b.....', 'b......'],
+    s_winter: ['q..q..q', '.q.q.q.', '..qqq..', 'qqqqqqq', '..qqq..', '.q.q.q.', 'q..q..q'],
+    s_spring: ['..h.hh.', '.hh.hh.', '..hhh..', '...f...', '...f...', '..bbb..', '.bbbbb.'],
     // ---- портреты 16x16 ----
     p_antonio: ['................', '......rrrr......', '....rrrrrrrr....', '...rrrrrrrrrrR..', '....kkkkkkkk....', '...kkssssssk....',
                 '...ksksssksk....', '....sssSsss.....', '....skkkkks.....', '....sssssss.....', '.....skkks......', '......sss.......',
@@ -1814,6 +1962,35 @@ CH.RULES = [
                '.xxxxxXxxXxxxxx.', '.xxxxxXxxXxxxxx.', 'xxxxxxXxxXxxxxxx', 'xxxxxxXxxXxxxxxx']
   };
 
+  // Слои портрета своего героя: 1/2 — кожа, 3/4 — волосы, x/X — одежда цвета героя
+  function L(o) { var rows = []; for (var i = 0; i < 16; i++) rows.push(o[i] || '................'); return rows; }
+  S.LAYERS = {
+    base: L({ 4: '.....111111.....', 5: '....11111111....', 6: '....11111111....', 7: '....11k11k11....', 8: '....11112111....', 9: '....11111111....',
+              10: '.....1kkkk1.....', 11: '......1221......', 12: '...xxxxxxxxxx...', 13: '..xxxxxxxxxxxx..', 14: '.xxxxXxxxxXxxxx.', 15: '.xxxxXxxxxXxxxx.' }),
+    hair: [null,
+      L({ 3: '.....333333.....', 4: '....33333333....', 5: '....3......3....' }),
+      L({ 3: '.....333333.....', 4: '....33333333....', 5: '...33......33...', 6: '...3........3...', 7: '...3........3...', 8: '...3........3...', 9: '...3........3...', 10: '...3........3...', 11: '...34......43...' }),
+      L({ 4: '....3......3....', 5: '....3......3....', 6: '....3......3....' })],
+    beard: [null,
+      L({ 9: '......3333......' }),
+      L({ 9: '....3......3....', 10: '....33kkkk33....', 11: '.....333333.....' }),
+      L({ 9: '....3......3....', 10: '....33kkkk33....', 11: '....33333333....', 12: '.....333333.....', 13: '......3443......' })],
+    hat: [null,
+      L({ 1: '.....y.yy.y.....', 2: '.....yyyyyy.....', 3: '.....yryyry.....' }),
+      L({ 2: '.....llllll.....', 3: '....llllllll....', 4: '....llGllGll....', 5: '...llllllllll...', 6: '.......ll.......', 7: '.......ll.......' }),
+      L({ 2: '.....xxxxxx.....', 3: '....xxxxxxxx....', 4: '...xxX....Xxx...', 5: '...xX......Xx...', 6: '...xX......Xx...', 7: '...xX......Xx...', 8: '...xX......Xx...', 9: '...xX......Xx...', 10: '...xX......Xx...', 11: '...xxX....Xxx...' }),
+      L({ 1: '.....BBBBBB.....', 2: '....BbbbbbbB....', 3: '....bbbbbbbb....', 4: '....bBbBbBbB....' }),
+      L({ 0: '.......ww.......', 1: '......wyyw......', 2: '.....wwyyww.....', 3: '.....wyyyyw.....', 4: '....wwwwwwww....' }),
+      L({ 2: '.....wwwwww.....', 3: '....wwwrrwww....', 4: '....wwwwwwww....' }),
+      L({ 2: '......yyyy......', 3: '.....yYYYYy.....', 4: '..yyyyyyyyyyyy..' }),
+      L({ 1: '...q........q...', 2: '...qq.llll.qq...', 3: '....qllllllq....', 4: '....llllllll....' })],
+    extra: [null,
+      L({ 4: '...........k....', 5: '..........k.....', 6: '....kkkk.k......', 7: '.....kkk........', 8: '......k.........' }),
+      L({ 6: '..........R.....', 8: '..........R.....', 9: '.........R......' }),
+      L({ 6: '....nnnnnnnn....', 7: '....nnknnknn....', 8: '....nnnNNnnn....', 9: '.....nnNNnn.....', 10: '......nNNn......', 11: '.......NN.......' }),
+      L({ 8: '....uu....uu....', 9: '....u......u....' })]
+  };
+
   function shade(hex, f) {
     var c = parseInt(hex.slice(1), 16), r = (c >> 16) & 255, g = (c >> 8) & 255, b = c & 255;
     if (f < 0) { r *= 1 + f; g *= 1 + f; b *= 1 + f; }
@@ -1824,10 +2001,11 @@ CH.RULES = [
   S.rgb = function (hex) { var c = parseInt(hex.slice(1), 16); return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
 
   // Рисует спрайт в контекст (пиксель = 1 единица * scale)
-  S.draw = function (ctx, name, x, y, color, scale) {
-    var d = S.D[name]; if (!d) return;
+  // map — подмена цветов по буквам (сезонная листва, кожа и волосы портрета)
+  S.draw = function (ctx, name, x, y, color, scale, map) {
+    var d = typeof name === 'string' ? S.D[name] : name; if (!d) return;
     scale = scale || 1;
-    var pal = S.PAL;
+    var pal = map ? Object.assign({}, S.PAL, map) : S.PAL;
     for (var j = 0; j < d.length; j++) {
       var row = d[j];
       for (var i = 0; i < row.length; i++) {
@@ -1853,9 +2031,23 @@ CH.RULES = [
   S.img = function (name, scale, color, cls) {
     return '<img class="spr ' + (cls || '') + '" src="' + S.url(name, scale || 3, color) + '" alt="">';
   };
+  S.lookUrl = function (look, color, scale) {
+    var key = 'look|' + CH.LOOK_KEYS.map(function (k) { return look[k] || 0; }).join('.') + '|' + color + '|' + scale;
+    if (cache[key]) return cache[key];
+    if (typeof document === 'undefined') return '';
+    var c = document.createElement('canvas'); c.width = c.height = 16 * scale;
+    var g = c.getContext('2d'), sk = CH.SKIN[look.skin || 0], hc = CH.HAIRC[look.hairc || 0];
+    var map = { '1': sk[0], '2': sk[1], '3': hc[0], '4': hc[1] }, Ls = S.LAYERS;
+    [Ls.base, Ls.hair[look.hair || 0], Ls.beard[look.beard || 0], Ls.hat[look.hat || 0], Ls.extra[look.extra || 0]].forEach(function (rows) {
+      if (rows) S.draw(g, rows, 0, 0, color, scale, map);
+    });
+    return (cache[key] = c.toDataURL());
+  };
   S.portrait = function (hero, scale) {
-    var id = hero.id && CH.HEROES[hero.id] ? 'p_' + hero.id : 'p_custom';
-    return S.img(id, scale || 4, hero.color, 'portrait');
+    scale = scale || 4;
+    if (hero.id && CH.HEROES[hero.id]) return S.img('p_' + hero.id, scale, hero.color, 'portrait');
+    if (hero.look) return '<img class="spr portrait" src="' + S.lookUrl(hero.look, hero.color || '#a35bd6', scale) + '" alt="">';
+    return S.img('p_custom', scale, hero.color, 'portrait');
   };
   S.unit = function (type, scale) { return S.img(type, scale || 2, null, 'uico'); };
   S.emblem = function (e, color, scale) {
@@ -2021,7 +2213,7 @@ CH.RULES = [
 (function () {
   var CH = window.CH;
   var Net = CH.Net = {};
-  var PREFIX = 'chuma-na-vse-doma-v2-';
+  var PREFIX = 'chuma-na-vse-doma-v21-';
   var qs = new URLSearchParams(location.search);
   Net.mode = qs.get('net') === 'local' ? 'local' : qs.get('net') === 'peer' ? 'peer' : 'mqtt';
   Net.CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -2145,7 +2337,7 @@ CH.RULES = [
 
   // ---------- Локальный режим (вкладки одного браузера) ----------
   function localHost(code, h) {
-    var bc = new BroadcastChannel('chuma2-' + code), conns = {};
+    var bc = new BroadcastChannel('chuma21-' + code), conns = {};
     bc.onmessage = function (e) {
       var m = e.data; if (m.to !== 'host') return;
       if (m.kind === 'open') { conns[m.from] = 1; bc.postMessage({ to: m.from, kind: 'opened' }); }
@@ -2159,7 +2351,7 @@ CH.RULES = [
     });
   }
   function localJoin(code, h) {
-    var bc = new BroadcastChannel('chuma2-' + code), me = 'c' + Math.random().toString(36).slice(2), open = false;
+    var bc = new BroadcastChannel('chuma21-' + code), me = 'c' + Math.random().toString(36).slice(2), open = false;
     bc.onmessage = function (e) {
       var m = e.data;
       if (m.kind === 'hostup') { if (open) { open = false; h.onClose(); } bc.postMessage({ to: 'host', from: me, kind: 'open' }); }
@@ -2192,7 +2384,7 @@ CH.RULES = [
     'wss://mqtt.eclipseprojects.io:443/mqtt'
   ];
   Net.BROKER_NAMES = ['EMQX', 'HiveMQ', 'Mosquitto', 'Eclipse'];
-  var ROOT = 'chumanadoma2/';
+  var ROOT = 'chumanadoma21/';
   var CHUNK = 30000;
 
   // ---------- кодирование пакетов MQTT 3.1.1 ----------
@@ -2407,7 +2599,7 @@ CH.RULES = [
     var S = this;
     S.code = code; S.net = net;
     S.players = []; // {cid, pid, nick, hero, bot}
-    S.rounds = 20; S.orderTime = 50;
+    S.rounds = 20; S.orderTime = 50; S.mapType = 'random'; S.chatLog = [];
     S.hostCid = null; S.nextPid = 1;
     S.phase = 'lobby'; S.st = null; S.orders = {}; S.ready = {}; S.rready = {}; S.deadline = 0; S.offers = {};
     S.cidConn = {}; S.connCid = {}; S.local = {};
@@ -2440,7 +2632,7 @@ CH.RULES = [
   // ---------- Представления ----------
   SP.lobbyView = function (cid) {
     var S = this, me = S.byCid(cid);
-    return { t: 'lobby', code: S.code, rounds: S.rounds, orderTime: S.orderTime, isHost: cid === S.hostCid, you: me ? me.pid : null,
+    return { t: 'lobby', code: S.code, rounds: S.rounds, orderTime: S.orderTime, map: S.mapType, isHost: cid === S.hostCid, you: me ? me.pid : null,
              players: S.players.map(function (p) { return { pid: p.pid, nick: p.nick, hero: p.hero, bot: p.bot, online: p.bot || S.online(p.cid), host: p.cid === S.hostCid }; }) };
   };
   SP.gameView = function (cid) {
@@ -2473,6 +2665,7 @@ CH.RULES = [
         if (isHost && S.phase === 'lobby') {
           if (CH.ROUND_OPTS.indexOf(m.rounds) >= 0) S.rounds = m.rounds;
           if (CH.TIME_OPTS.indexOf(m.orderTime) >= 0) S.orderTime = m.orderTime;
+          if (m.map === 'random' || CH.MAPS[m.map]) S.mapType = m.map;
           S.broadcastView();
         }
         break;
@@ -2520,7 +2713,9 @@ CH.RULES = [
       case 'chat':
         if (me && typeof m.text === 'string' && m.text.trim()) {
           var txt = m.text.trim().slice(0, 200);
-          S.allCids().forEach(function (c) { S.send(c, { t: 'chat', from: pid, nick: me.nick, text: txt }); });
+          var cm = { t: 'chat', from: pid, nick: me.nick, text: txt, color: me.hero ? me.hero.color : null };
+          S.chatLog.push(cm); if (S.chatLog.length > 40) S.chatLog.shift();
+          S.allCids().forEach(function (c) { S.send(c, cm); });
         }
         break;
     }
@@ -2543,7 +2738,7 @@ CH.RULES = [
       S.players.push(me);
       if (!S.hostCid) S.hostCid = cid;
     } else if (me && m.nick) me.nick = String(m.nick).slice(0, 16);
-    S.send(cid, { t: 'welcome', pid: me ? me.pid : null, isHost: cid === S.hostCid, code: S.code });
+    S.send(cid, { t: 'welcome', pid: me ? me.pid : null, isHost: cid === S.hostCid, code: S.code, chat: S.chatLog });
     if (!me) S.send(cid, { t: 'toast', text: 'Игра уже идёт — ты зритель. Смотри и учись.' });
     S.broadcastView();
   };
@@ -2553,7 +2748,7 @@ CH.RULES = [
     if (m.heroId && CH.HEROES[m.heroId]) {
       var holder = S.players.filter(function (p) { return p !== me && p.hero && p.hero.id === m.heroId; })[0];
       if (holder && !holder.bot) { S.toast(me.cid, 'Этот герой уже занят. Самозванцев у нас и так хватает.', 'error'); return; }
-      me.hero = E.heroSpec(m.heroId);
+      me.hero = E.heroSpec(m.heroId, null, { perk: m.perk, motto: m.motto });
       if (holder) { holder.hero = null; holder.hero = S.botHero(); }
     } else if (m.custom) {
       var h = E.heroSpec(null, m.custom);
@@ -2575,14 +2770,16 @@ CH.RULES = [
     var S = this;
     var free = CH.HERO_ORDER.filter(function (k) { return !S.players.some(function (p) { return p.hero && p.hero.id === k; }); });
     var hero;
-    if (free.length) hero = E.heroSpec(free[0]);
+    var perk = E.pick(S.rng, CH.PERK_IDS);
+    if (free.length) hero = E.heroSpec(free[0], null, { perk: perk });
     else {
       var names = ['Барон Подагр', 'Графиня Чахотка', 'Епископ Жадан', 'Ярл Гнилобород'];
       var used = S.players.filter(function (p) { return p.hero; }).map(function (p) { return p.hero.color; });
       var n = S.players.filter(function (p) { return p.bot; }).length;
       hero = E.heroSpec(null, { name: names[n % names.length], title: 'Бот без совести', passive: E.pick(S.rng, ['pious', 'butcher', 'miser']),
         active: E.pick(S.rng, ['bribe', 'execution', 'poison']), unique: E.pick(S.rng, CH.UNIQUE_UNITS), emblem: E.pick(S.rng, CH.EMBLEMS),
-        color: CH.CUSTOM_COLORS.filter(function (c) { return used.indexOf(c) < 0; })[0] });
+        color: CH.CUSTOM_COLORS.filter(function (c) { return used.indexOf(c) < 0; })[0], perk: perk,
+        look: { skin: Math.floor(S.rng() * 6), hair: Math.floor(S.rng() * 4), hairc: Math.floor(S.rng() * 6), beard: Math.floor(S.rng() * 4), hat: Math.floor(S.rng() * 9), extra: Math.floor(S.rng() * 5) } });
     }
     return hero;
   };
@@ -2593,7 +2790,7 @@ CH.RULES = [
     if (ready.length < 2) { S.toast(S.hostCid, 'Нужно хотя бы два претендента с героями. Воевать с собой скучно.', 'error'); return; }
     var noHero = S.players.filter(function (p) { return !p.hero; });
     if (noHero.length) { S.toast(S.hostCid, 'Не все выбрали героя: ' + noHero.map(function (p) { return p.nick; }).join(', '), 'error'); return; }
-    S.st = E.newGame(S.players.map(function (p) { return { pid: p.pid, nick: p.nick, bot: p.bot, hero: p.hero }; }), { rounds: S.rounds });
+    S.st = E.newGame(S.players.map(function (p) { return { pid: p.pid, nick: p.nick, bot: p.bot, hero: p.hero }; }), { rounds: S.rounds, map: S.mapType });
     S.offers = {};
     S.startOrders();
   };
@@ -2689,7 +2886,7 @@ CH.RULES = [
     var S = this; if (S.noSave) return;
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({ code: S.code, players: S.players, rounds: S.rounds, orderTime: S.orderTime,
-        hostCid: S.hostCid, nextPid: S.nextPid, phase: S.phase, st: S.st, orders: S.orders, savedAt: Date.now(), ver: CH.VERSION }));
+        hostCid: S.hostCid, nextPid: S.nextPid, mapType: S.mapType, phase: S.phase, st: S.st, orders: S.orders, savedAt: Date.now(), ver: CH.VERSION }));
     } catch (e) {}
   };
   SP.clearSave = function () { if (this.noSave) return; try { localStorage.removeItem(SAVE_KEY); } catch (e) {} };
@@ -2702,6 +2899,7 @@ CH.RULES = [
   };
   SP.restore = function (d) {
     var S = this;
+    S.mapType = d.mapType || 'random';
     S.players = d.players; S.rounds = d.rounds; S.orderTime = d.orderTime; S.hostCid = d.hostCid; S.nextPid = d.nextPid;
     S.st = d.st; S.orders = d.orders || {};
     if (d.phase === 'orders') { S.phase = 'orders'; S.ready = {}; S.deadline = Date.now() + S.roundTime() * 1000 + 20000;
@@ -2742,8 +2940,16 @@ CH.RULES = [
     water: ['#3a6ea5', '#3667a0', '#4278b0']
   };
   var SEA = ['#2b5785', '#29527e', '#2f5d8f'];
+  // Сезонная окраска: [цвет, доля примеси] по типу местности + подмена цветов спрайтов
+  var SEASON_TINT = {
+    summer: { land: null, sprite: null },
+    autumn: { land: ['#c9a04a', 0.3], forest: ['#b0642a', 0.55], sprite: { f: '#c4782c', F: '#7f4618', h: '#e0a83a', z: '#c9a04a', m: '#8a7a3a' } },
+    winter: { land: ['#e9eef2', 0.62], forest: ['#dfe7ea', 0.6], water: ['#22486e', 0.35], sprite: { f: '#3f6b55', F: '#2b4a3b', h: '#f4f7fa', n: '#eef2f5', N: '#b9c4cc', m: '#9aa8b0' } },
+    spring: { land: ['#9bd86a', 0.22], forest: ['#6fbf4a', 0.25], sprite: { h: '#f3a9cc' } }
+  };
   var FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
   var M = CH.MapR = { W: 0, H: 0, scale: 1, dpr: 1 };
+  M.seasonId = function (st) { return CH.SEASONS[CH.seasonOf(st.round)].id; };
 
   function rgb(h) { return S.rgb(h); }
   function mix(a, b, f) { return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
@@ -2824,7 +3030,13 @@ CH.RULES = [
     var ownerRgb = {}; for (var k in colors) ownerRgb[k] = rgb(colors[k]);
     var plagueC = rgb('#7d9b2e'), burnC = rgb('#3a2a1a');
     var palCache = {};
-    function pal(t, i) { var key = t + i; return palCache[key] || (palCache[key] = rgb(TC[t][i])); }
+    var sz = SEASON_TINT[M.seasonId(st)] || SEASON_TINT.summer, spr = sz.sprite;
+    function pal(t, i) {
+      var key = t + i; if (palCache[key]) return palCache[key];
+      var c = rgb(TC[t][i]), tint = t === 'forest' ? sz.forest : t === 'water' ? sz.water : t === 'mountain' ? (sz.land && sz.land[0] === '#e9eef2' ? ['#e9eef2', 0.35] : null) : sz.land;
+      if (tint) c = mix(c, rgb(tint[0]), tint[1]);
+      return (palCache[key] = c);
+    }
     var sea = SEA.map(rgb);
     for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
       var idx = y * W + x, id = lut[idx], h = hash(x, y) % 9, sh = h < 6 ? 0 : h < 8 ? 1 : 2, c;
@@ -2860,14 +3072,14 @@ CH.RULES = [
       var oc = p.owner != null ? colors[p.owner] : '#9a9a9a', B = p.b || {};
       switch (p.t) {
         case 'forest':
-          [[-7, -8], [1, -9], [-3, -2], [4, -3], [-8, 0]].forEach(function (o, i) { if (i < 3 || rr() < 0.5) S.draw(b, rr() < 0.5 ? 'tree' : 'tree2', cx + o[0] - 2, cy + o[1] - 2); });
+          [[-7, -8], [1, -9], [-3, -2], [4, -3], [-8, 0]].forEach(function (o, i) { if (i < 3 || rr() < 0.5) S.draw(b, rr() < 0.5 ? 'tree' : 'tree2', cx + o[0] - 2, cy + o[1] - 2, null, 1, spr); });
           if (B.sawmill) S.draw(b, 'sawmill', cx - 3, cy - 5);
           break;
         case 'hills':
-          S.draw(b, 'hill', cx - 9, cy - 6); S.draw(b, 'hill', cx - 1, cy - 9); if (rr() < 0.6) S.draw(b, 'hill', cx - 5, cy - 2);
+          S.draw(b, 'hill', cx - 9, cy - 6, null, 1, spr); S.draw(b, 'hill', cx - 1, cy - 9, null, 1, spr); if (rr() < 0.6) S.draw(b, 'hill', cx - 5, cy - 2, null, 1, spr);
           if (B.mine) S.draw(b, 'mine', cx - 3, cy - 5);
           break;
-        case 'swamp': S.draw(b, 'reeds', cx - 8, cy - 7); S.draw(b, 'reeds', cx + 1, cy - 4); break;
+        case 'swamp': S.draw(b, 'reeds', cx - 8, cy - 7, null, 1, spr); S.draw(b, 'reeds', cx + 1, cy - 4, null, 1, spr); break;
         case 'mountain': S.draw(b, 'mountain', cx - 6, cy - 7); if (rr() < 0.7) S.draw(b, 'mountain', cx - 1, cy - 3); break;
         case 'water':
           S.draw(b, 'wave', cx - 6, cy - 4); S.draw(b, 'wave', cx + 1, cy + 1); S.draw(b, 'wave', cx - 3, cy + 5);
@@ -2875,14 +3087,15 @@ CH.RULES = [
           break;
         case 'village':
           S.draw(b, 'village', cx - 5, cy - 8);
-          if (B.mill) S.draw(b, 'mill', cx + 3, cy - 9); else S.draw(b, 'tree', cx + 3, cy - 9);
+          if (B.mill) S.draw(b, 'mill', cx + 3, cy - 9); else S.draw(b, 'tree', cx + 3, cy - 9, null, 1, spr);
           break;
         case 'monastery': S.draw(b, 'monastery', cx - 3, cy - 11); if (B.brewery) S.draw(b, 'brewery', cx + 4, cy - 6); break;
         case 'city': S.draw(b, 'city', cx - 4, cy - 9, oc); break;
         case 'capital': S.draw(b, 'capital', cx - 5, cy - 11, oc); break;
         case 'plain':
-          if (rr() < 0.5) { b.fillStyle = '#c9d86a'; b.fillRect(cx - 5 + Math.floor(rr() * 8), cy - 6 + Math.floor(rr() * 6), 1, 1); }
-          if (rr() < 0.4) { b.fillStyle = '#e8e2b0'; b.fillRect(cx - 2 + Math.floor(rr() * 6), cy - 7 + Math.floor(rr() * 6), 1, 1); }
+          var sid = M.seasonId(st), dots = sid === 'winter' ? ['#ffffff', '#d4dde4'] : sid === 'autumn' ? ['#d9822b', '#b5451b'] : sid === 'spring' ? ['#f3a9cc', '#ffffff'] : ['#c9d86a', '#e8e2b0'];
+          if (rr() < 0.5) { b.fillStyle = dots[0]; b.fillRect(cx - 5 + Math.floor(rr() * 8), cy - 6 + Math.floor(rr() * 6), 1, 1); }
+          if (rr() < 0.4) { b.fillStyle = dots[1]; b.fillRect(cx - 2 + Math.floor(rr() * 6), cy - 7 + Math.floor(rr() * 6), 1, 1); }
           if (B.mill) S.draw(b, 'mill', cx - 2, cy - 9);
           break;
       }
@@ -2951,6 +3164,17 @@ CH.RULES = [
     return w + 2 * lw;
   }
 
+  // Местный гарнизон: маленький серый кружок с числом, без рамки, цвета и полоски состава
+  function neutralTag(g, cx, cy, n, fs) {
+    var txt = String(n), tw = g.measureText(txt).width, h = Math.round(fs * 1.25), w = Math.max(h, Math.ceil(tw + fs * 0.7));
+    var x = Math.round(cx - w / 2), y = Math.round(cy - h / 2);
+    g.fillStyle = 'rgba(30,24,20,0.5)'; rrect(g, x, y, w, h, h / 2); g.fill();
+    g.strokeStyle = 'rgba(220,210,190,0.35)'; g.lineWidth = Math.max(1, fs * 0.08); g.stroke();
+    g.fillStyle = 'rgba(232,224,206,0.92)';
+    g.fillText(txt, x + w / 2, y + h / 2 + fs * 0.05);
+    return w;
+  }
+
   // o: { sel, targets, targetColor, moves:[{from,to,color,n}], battles:[ids], flash:[ids], t }
   M.draw = function (o) {
     var ctx = M.ctx, st = M.st; if (!ctx || !st) return;
@@ -2970,21 +3194,26 @@ CH.RULES = [
     // флажки
     var g = M.fx, k = M.scale * M.dpr; if (!g) return;
     g.clearRect(0, 0, M.fxc.width, M.fxc.height);
-    var fs = Math.round(Math.max(11 * M.dpr, 5.6 * k));
+    var fs = Math.round(Math.max(11 * M.dpr, 5.6 * k)), fsN = Math.round(Math.max(8.5 * M.dpr, 3.9 * k));
     g.font = '700 ' + fs + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle';
     st.provs.forEach(function (p) {
       var keys = Object.keys(p.armies); if (!keys.length) return;
       var c = M.center(p.id);
       var parts = keys.map(function (pk) { return [pk, E.armyTotal(p.armies[pk])]; }).filter(function (x) { return x[1] > 0; });
+      var players = parts.filter(function (x) { return x[0] !== 'n'; }), loc = parts.filter(function (x) { return x[0] === 'n'; })[0];
       var gap = Math.round(fs * 0.25), tot = -gap;
-      parts.forEach(function (pt) { tot += flagSize(g, pt[1], fs) + Math.round(fs * 0.26) + gap; });
+      players.forEach(function (pt) { tot += flagSize(g, pt[1], fs) + Math.round(fs * 0.26) + gap; });
       var x = (c[0] + 0.5) * k - tot / 2, y = (c[1] + 7) * k;
-      parts.forEach(function (pt) {
-        var col = pt[0] === 'n' ? '#5f5a52' : (M.colors[pt[0]] || '#fff');
+      players.forEach(function (pt) {
         var w = flagSize(g, pt[1], fs) + Math.round(fs * 0.26);
-        flag(g, x + w / 2, y, col, pt[1], fs, p.armies[pt[0]]);
+        flag(g, x + w / 2, y, M.colors[pt[0]] || '#fff', pt[1], fs, p.armies[pt[0]]);
         x += w + gap;
       });
+      if (loc) {
+        g.font = '600 ' + fsN + 'px ' + FONT;
+        neutralTag(g, (c[0] + 0.5) * k, (c[1] + (players.length ? 13.5 : 7.5)) * k, loc[1], fsN);
+        g.font = '700 ' + fs + 'px ' + FONT;
+      }
     });
     var fs2 = Math.round(fs * 0.88);
     g.font = '700 ' + fs2 + 'px ' + FONT;
@@ -3170,7 +3399,7 @@ CH.RULES = [
 
   App.onMessage = function (m) {
     switch (m.t) {
-      case 'welcome': App.you = m.pid; App.isHost = m.isHost; App.code = m.code; break;
+      case 'welcome': App.you = m.pid; App.isHost = m.isHost; App.code = m.code; if (m.chat) { App.chat = m.chat.slice(); renderChat(); } break;
       case 'lobby': closeWaits(); App.lobby = m; App.you = m.you; App.isHost = m.isHost; App.st = null; App.endShown = false; App.reportShown = 0; renderLobby(); break;
       case 'game': closeWaits(); onGame(m); break;
       case 'ready': App.ready = m.ready; if (App.screen === 'game') { renderFoot(); } break;
@@ -3178,7 +3407,8 @@ CH.RULES = [
       case 'chat':
         App.chat.push(m); if (App.chat.length > 80) App.chat.shift();
         if (m.from == null) toast(m.text, m.sound);
-        else if (m.from !== App.you && !$('#dipchat')) toast((App.st ? heroName(m.from) : m.nick) + ': ' + m.text, 'click');
+        else if (m.from !== App.you && !$('#dipchat') && !$('#lobbychat')) toast((App.st ? heroName(m.from) : m.nick) + ': ' + m.text, 'click');
+        else if (m.from !== App.you) A.play('click');
         renderChat();
         break;
       case 'allyOffer': showAllyOffer(m.from); break;
@@ -3192,10 +3422,14 @@ CH.RULES = [
   function renderLobby() {
     App.screen = 'lobby';
     var L = App.lobby, mine = L.players.filter(function (p) { return p.pid === L.you; })[0];
+    var oldIn = $('#lchatin'), keepText = oldIn ? oldIn.value : '', keepFocus = oldIn && document.activeElement === oldIn;
+    var oldRight = $('#lobby .right'), keepScroll = oldRight ? oldRight.scrollTop : 0;
     var solo = L.code === 'SOLO';
     var plist = L.players.map(function (p) {
       return '<div class="pl">' + (p.hero ? S.portrait(p.hero, 2) : '<span style="width:32px;height:32px;display:inline-block;background:#0005"></span>') +
-        '<div class="nm"><b>' + esc(p.nick) + '</b>' + (p.host ? ' 👑' : '') + (p.bot ? ' 🤖' : '') + '<br><span class="small" style="color:' + (p.hero ? p.hero.color : '#999') + '">' + (p.hero ? esc(p.hero.name) : 'выбирает героя…') + '</span></div>' +
+        '<div class="nm"><b>' + esc(p.nick) + '</b>' + (p.host ? ' 👑' : '') + (p.bot ? ' 🤖' : '') + '<br><span class="small" style="color:' + (p.hero ? p.hero.color : '#999') + '">' + (p.hero ? esc(p.hero.name) : 'выбирает героя…') + '</span>' +
+        (p.hero && p.hero.perk ? ' <span class="tag">' + CH.PERKS[p.hero.perk].name + '</span>' : '') +
+        (p.hero && p.hero.motto ? '<br><i class="small muted">«' + esc(p.hero.motto) + '»</i>' : '') + '</div>' +
         '<span class="dot' + (p.online ? ' on' : '') + '"></span>' +
         (L.isHost && p.pid !== L.you ? '<button class="btn tiny ghost" data-kick="' + p.pid + '">✕</button>' : '') + '</div>';
     }).join('');
@@ -3210,22 +3444,29 @@ CH.RULES = [
     var saved = myHeroes();
     cards += saved.map(function (h, i) {
       var isMine = custom && custom.name === h.name;
-      return '<div class="hcard ' + (isMine ? 'mine' : '') + '" data-saved="' + i + '">' + S.portrait({ id: 'custom', color: h.color }, 3) +
+      return '<div class="hcard ' + (isMine ? 'mine' : '') + '" data-saved="' + i + '">' + S.portrait({ id: 'custom', color: h.color, look: h.look }, 3) +
         '<div><div class="hn" style="color:' + h.color + '">' + esc(h.name) + ' ' + S.emblem(h.emblem, h.color, 1) + '</div><div class="ht">' + esc(h.title) + '</div></div></div>';
     }).join('');
     cards += '<div class="hcard" data-new="1" style="justify-content:center;min-height:62px"><div class="hn">＋ Свой герой</div></div>';
     var opts = L.isHost ?
       '<div class="row small">Раундов: <select id="o-r">' + CH.ROUND_OPTS.map(function (n) { return '<option ' + (n === L.rounds ? 'selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' +
       ' Время хода: <select id="o-t">' + CH.TIME_OPTS.map(function (n) { return '<option value="' + n + '" ' + (n === L.orderTime ? 'selected' : '') + '>' + n + ' → ' + n * 2 + ' с</option>'; }).join('') + '</select></div>' +
+      '<div class="row small" style="margin-top:4px">Карта: <select id="o-m"><option value="random"' + (L.map === 'random' ? ' selected' : '') + '>🎲 Случайная</option>' +
+        CH.MAP_IDS.map(function (k) { return '<option value="' + k + '"' + (L.map === k ? ' selected' : '') + '>' + CH.MAPS[k].name + '</option>'; }).join('') + '</select></div>' +
+      '<div class="small muted">' + esc(mapDesc(L.map)) + '</div>' +
       '<div class="small muted">Время на раунд растёт от первого раунда к последнему. Катка: до ' + Math.round(L.rounds * (L.orderTime * 1.5 + 15) / 60) + ' мин, быстрее — если все жмут «Готов».</div>' +
       '<div class="row"><button class="btn small wood" id="b-bot">+ Бот</button><button class="btn gold sp" id="b-start">⚔ Начать передел!</button></div>'
-      : '<div class="small muted">Раундов: ' + L.rounds + ', время хода ' + L.orderTime + ' → ' + L.orderTime * 2 + ' с. Ждём, пока хост начнёт. Можно пока точить вилы.</div>';
+      : '<div class="small">Раундов: <b>' + L.rounds + '</b>, время хода <b>' + L.orderTime + ' → ' + L.orderTime * 2 + ' с</b><br>Карта: <b>' + (L.map === 'random' || !CH.MAPS[L.map] ? '🎲 случайная' : CH.MAPS[L.map].name) + '</b></div>' +
+        '<div class="small muted">' + esc(mapDesc(L.map)) + ' Ждём, пока хост начнёт. Можно пока точить вилы.</div>';
     $('#app').innerHTML = '<div id="lobby"><div class="left">' +
       '<div class="frame">' + (solo ? '<h3>Тренировка</h3><div class="small muted">Ты и боты. Боты не обижаются, когда их предают.</div>' :
         '<div class="small muted">Код комнаты</div><div class="row"><span class="code">' + esc(L.code) + '</span><button class="btn small gold" id="b-share">Позвать друзей</button></div>' +
         (L.isHost ? '<div class="small muted">Ты хост: держи эту вкладку открытой, экран не гаси. Если вылетел — открой сайт снова и жми «Продолжить».</div>' : '')) + '</div>' +
       '<div class="frame">' + opts + '</div>' +
       '<div class="frame plist"><h3>Претенденты (' + L.players.length + '/8)</h3>' + plist + '</div>' +
+      '<div class="frame"><h3>Глашатай (чат)</h3><div class="chat" id="lobbychat"></div>' +
+      '<div class="chips">' + CH.CHAT_PHRASES.slice(0, 6).map(function (p, i) { return '<button class="btn ghost" data-lphrase="' + i + '">' + esc(p) + '</button>'; }).join('') + '</div>' +
+      '<div class="row" style="flex-wrap:nowrap"><input type="text" id="lchatin" maxlength="200" placeholder="Сказать всем…"><button class="btn small" id="lchatgo">➤</button></div></div>' +
       '<div class="row"><button class="btn ghost small" id="b-rules2">📖 Правила</button><button class="btn ghost small" id="b-leave">Выйти</button></div>' +
       '</div><div class="right"><div class="frame"><h3>Выбери героя</h3><div class="heroes">' + cards + '</div>' +
       '<div class="hint">Тапни героя, чтобы прочитать про него и выбрать. Можно создать своего — для пятого друга, бабушки или кота.</div></div></div></div>';
@@ -3234,15 +3475,24 @@ CH.RULES = [
     $('[data-new]').onclick = function () { A.play('click'); heroBuilder(null, -1); };
     document.querySelectorAll('[data-kick]').forEach(function (el) { el.onclick = function () { App.send({ t: 'kick', pid: el.dataset.kick }); }; });
     if (L.isHost) {
-      $('#o-r').onchange = function () { App.send({ t: 'opts', rounds: +this.value, orderTime: L.orderTime }); };
-      $('#o-t').onchange = function () { App.send({ t: 'opts', rounds: L.rounds, orderTime: +this.value }); };
+      $('#o-r').onchange = function () { App.send({ t: 'opts', rounds: +this.value, orderTime: L.orderTime, map: L.map }); };
+      $('#o-t').onchange = function () { App.send({ t: 'opts', rounds: L.rounds, orderTime: +this.value, map: L.map }); };
       $('#b-bot').onclick = function () { A.play('click'); App.send({ t: 'addBot' }); };
       $('#b-start').onclick = function () { A.init(); A.play('fanfare'); keepAwake(); App.send({ t: 'start' }); };
     }
     if ($('#b-share')) $('#b-share').onclick = share;
     $('#b-rules2').onclick = showRules;
+    renderChat();
+    var lin = $('#lchatin'); lin.value = keepText; if (keepFocus) lin.focus();
+    $('#lobby .right').scrollTop = keepScroll;
+    function say() { if (lin.value.trim()) { App.send({ t: 'chat', text: lin.value }); lin.value = ''; } }
+    $('#lchatgo').onclick = function () { A.play('click'); say(); lin.focus(); };
+    lin.onkeydown = function (e) { if (e.key === 'Enter') say(); };
+    document.querySelectorAll('[data-lphrase]').forEach(function (el) { el.onclick = function () { A.play('click'); App.send({ t: 'chat', text: CH.CHAT_PHRASES[+el.dataset.lphrase] }); }; });
+    if (L.isHost) $('#o-m').onchange = function () { App.send({ t: 'opts', rounds: L.rounds, orderTime: L.orderTime, map: this.value }); };
     $('#b-leave').onclick = function () { if (confirm('Выйти в главное меню?')) { App.send({ t: 'leave' }); location.href = location.pathname + (CH.Net.mode === 'local' ? '?net=local' : ''); } };
   }
+  function mapDesc(k) { return k === 'random' || !CH.MAPS[k] ? 'Тип карты станет известен в начале игры.' : CH.MAPS[k].desc; }
   function share() {
     var url = location.origin + location.pathname + '?room=' + App.code + (CH.Net.mode === 'local' ? '&net=local' : '');
     var text = 'Го в «Чума на все ваши дома»! Код комнаты: ' + App.code;
@@ -3257,36 +3507,70 @@ CH.RULES = [
       '<div class="sec">Способность: ' + esc(ac.name) + ' <span class="muted">(перезарядка ' + ac.cd + ')</span></div><div class="small">' + esc(ac.desc) + '</div>' +
       '<div class="sec">Уникальный отряд</div><div class="row small">' + S.unit(h.unique, 3) + '<div><b>' + esc(un.name) + '</b> — ' + un.cost + ' зол. ' + unitStats(h.unique) + '<br>' + esc(un.desc) + '</div></div>';
   }
+  function perkPicker(cur) {
+    return '<div class="sec">Приданое (стартовый бонус)</div><div class="opts">' + CH.PERK_IDS.map(function (k) {
+      return '<div class="opt ' + (cur === k ? 'sel' : '') + '" data-k="perk" data-v="' + k + '"><b>' + esc(CH.PERKS[k].name) + '</b><br>' + esc(CH.PERKS[k].desc) + '</div>';
+    }).join('') + '</div>';
+  }
+  function heroPrefs() { try { return JSON.parse(lsGet('chuma_heroprefs', '{}')); } catch (e) { return {}; } }
   function heroInfo(k) {
-    var h = CH.HEROES[k];
+    var h = CH.HEROES[k], pref = heroPrefs()[k] || {}, d = { perk: pref.perk || 'chest' };
     var ov = modal('<div class="row" style="align-items:flex-start;flex-wrap:nowrap;gap:12px">' + S.img('p_' + k, 6, h.color, 'portrait') +
       '<div><h2 style="color:' + h.color + '">' + esc(h.name) + '</h2><div class="muted small">' + esc(h.title) + '</div><p class="small" style="line-height:1.4">' + esc(h.bio) + '</p></div></div>' +
-      abilityBlock(h) + '<div class="row" style="margin-top:10px"><button class="btn gold big" id="b-pick">Выбрать ' + esc(h.name) + '</button></div>');
-    $('#b-pick', ov).onclick = function () { A.play('coin'); App.send({ t: 'pick', heroId: k }); ov.close(); };
+      abilityBlock(h) + perkPicker(d.perk) +
+      '<div class="sec">Девиз (по желанию)</div><input type="text" id="hi-motto" maxlength="60" placeholder="Напр.: «Сначала бьём, потом молимся»" value="' + esc(pref.motto || '') + '">' +
+      '<div class="row" style="margin-top:10px"><button class="btn gold big" id="b-pick">Выбрать ' + esc(h.name) + '</button></div>', { cls: 'frame wide' });
+    ov.addEventListener('click', function (e) {
+      var po = e.target.closest('.opt'); if (!po) return;
+      d.perk = po.dataset.v; ov.querySelectorAll('.opt[data-k=perk]').forEach(function (x) { x.classList.toggle('sel', x === po); }); A.play('click');
+    });
+    $('#b-pick', ov).onclick = function () {
+      var motto = $('#hi-motto', ov).value.trim(), all = heroPrefs(); all[k] = { perk: d.perk, motto: motto };
+      lsSet('chuma_heroprefs', JSON.stringify(all));
+      A.play('coin'); App.send({ t: 'pick', heroId: k, perk: d.perk, motto: motto }); ov.close();
+    };
   }
 
   function heroBuilder(h, idx) {
     var d = h ? JSON.parse(JSON.stringify(h)) : { name: App.nick || '', title: '', capitalName: '', color: CH.CUSTOM_COLORS[0], emblem: 'skull', passive: 'pious', active: 'execution', unique: 'ushkuy', bio: '' };
+    if (!d.look) d.look = { skin: 0, hair: 1, hairc: 1, beard: 2, hat: 1, extra: 0 };
+    if (!d.perk) d.perk = 'chest';
+    function lookRows() {
+      return CH.LOOK_KEYS.map(function (k) {
+        return '<div class="lk"><span>' + CH.LOOK[k].name + '</span><button class="btn tiny ghost" data-look="' + k + '" data-d="-1">◀</button><b id="lk-' + k + '">' + CH.LOOK[k].names[d.look[k]] + '</b><button class="btn tiny ghost" data-look="' + k + '" data-d="1">▶</button></div>';
+      }).join('');
+    }
     function opts(dict, key) {
       return '<div class="opts">' + Object.keys(dict).map(function (k) {
         return '<div class="opt ' + (d[key] === k ? 'sel' : '') + '" data-k="' + key + '" data-v="' + k + '"><b>' + esc(dict[k].name) + '</b>' + (dict[k].cd ? ' <span class="muted">(перезарядка ' + dict[k].cd + ')</span>' : '') + '<br>' + esc(dict[k].desc) + '</div>';
       }).join('') + '</div>';
     }
     var ov = modal('<h2>Свой герой</h2><div class="small muted">Для пятого друга, двоюродного дяди или того, кто опоздал.</div>' +
-      '<div class="row" style="flex-wrap:nowrap;align-items:flex-start;margin-top:6px"><div id="hb-prev"></div><div class="col sp" style="gap:6px">' +
+      '<div class="row" style="flex-wrap:nowrap;align-items:flex-start;margin-top:6px"><div id="hb-prev" style="text-align:center"></div><div class="col sp" style="gap:6px">' +
       '<input type="text" id="hb-name" maxlength="18" placeholder="Имя (напр. Барон Мюнхгаузен)" value="' + esc(d.name) + '">' +
       '<input type="text" id="hb-title" maxlength="40" placeholder="Титул (напр. Граф Всех Долгов)" value="' + esc(d.title) + '">' +
-      '<input type="text" id="hb-cap" maxlength="24" placeholder="Название столицы" value="' + esc(d.capitalName) + '"></div></div>' +
+      '<input type="text" id="hb-cap" maxlength="24" placeholder="Название столицы" value="' + esc(d.capitalName) + '">' +
+      '<input type="text" id="hb-motto" maxlength="60" placeholder="Девиз (напр. «Сначала бьём, потом молимся»)" value="' + esc(d.motto || '') + '"></div></div>' +
+      '<div class="sec">Внешность <button class="btn tiny wood" id="hb-rnd">🎲 Случайно</button></div><div class="looks">' + lookRows() + '</div>' +
       '<div class="sec">Цвет</div><div class="swatches">' + CH.CUSTOM_COLORS.map(function (c) { return '<span data-col="' + c + '" style="background:' + c + '" class="' + (c === d.color ? 'sel' : '') + '"></span>'; }).join('') + '</div>' +
       '<div class="sec">Герб</div><div class="row embl">' + CH.EMBLEMS.map(function (e) { return '<span data-em="' + e + '" class="' + (e === d.emblem ? 'sel' : '') + '">' + S.emblem(e, d.color, 2) + '</span>'; }).join('') + '</div>' +
+      perkPicker(d.perk) +
       '<div class="sec">Пассивка</div>' + opts(CH.PASSIVES, 'passive') +
       '<div class="sec">Способность</div>' + opts(CH.ACTIVES, 'active') +
       '<div class="sec">Уникальный отряд</div><div class="opts">' + CH.UNIQUE_UNITS.map(function (u) { return '<div class="opt ' + (d.unique === u ? 'sel' : '') + '" data-k="unique" data-v="' + u + '">' + S.unit(u, 2) + ' <b>' + esc(U[u].name) + '</b> (' + U[u].cost + ' зол.)<br>' + unitStats(u) + '. ' + esc(U[u].desc) + '</div>'; }).join('') + '</div>' +
       '<div class="sec">Биография (по желанию)</div><textarea id="hb-bio" maxlength="300" placeholder="Родился. Страдал. Пришёл за короной.">' + esc(d.bio) + '</textarea>' +
       '<div class="row" style="margin-top:8px"><button class="btn gold big" id="hb-ok">Сохранить и выбрать</button>' + (idx >= 0 ? '<button class="btn ghost small" id="hb-del">Удалить</button>' : '') + '</div>', { cls: 'frame wide' });
-    function prev() { $('#hb-prev', ov).innerHTML = S.portrait({ id: 'custom', color: d.color }, 4) + '<div style="text-align:center;margin-top:4px">' + S.emblem(d.emblem, d.color, 2) + '</div>'; }
+    function prev() {
+      $('#hb-prev', ov).innerHTML = S.portrait({ id: 'custom', color: d.color, look: d.look }, 6) + '<div style="text-align:center;margin-top:4px">' + S.emblem(d.emblem, d.color, 2) + '</div>';
+      CH.LOOK_KEYS.forEach(function (k) { var el = $('#lk-' + k, ov); if (el) el.textContent = CH.LOOK[k].names[d.look[k]]; });
+    }
     prev();
+    $('#hb-rnd', ov).onclick = function () {
+      CH.LOOK_KEYS.forEach(function (k) { d.look[k] = Math.floor(Math.random() * CH.LOOK[k].n); }); prev(); A.play('click');
+    };
     ov.addEventListener('click', function (e) {
+      var lb = e.target.closest('[data-look]');
+      if (lb) { var k = lb.dataset.look, n = CH.LOOK[k].n; d.look[k] = (d.look[k] + (+lb.dataset.d) + n) % n; prev(); A.play('click'); return; }
       var o = e.target.closest('.opt');
       if (o) { d[o.dataset.k] = o.dataset.v; ov.querySelectorAll('.opt[data-k="' + o.dataset.k + '"]').forEach(function (x) { x.classList.toggle('sel', x === o); }); A.play('click'); }
       var c = e.target.closest('[data-col]');
@@ -3297,6 +3581,7 @@ CH.RULES = [
     });
     $('#hb-ok', ov).onclick = function () {
       d.name = $('#hb-name', ov).value.trim(); d.title = $('#hb-title', ov).value.trim(); d.capitalName = $('#hb-cap', ov).value.trim(); d.bio = $('#hb-bio', ov).value.trim();
+      d.motto = $('#hb-motto', ov).value.trim();
       if (!d.name) { toast('Герою нужно имя. «Эй, ты» — не имя.', 'error'); return; }
       if (!d.title) d.title = 'Самозванец';
       if (!d.capitalName) d.capitalName = 'Твердыня ' + d.name;
@@ -3339,13 +3624,14 @@ CH.RULES = [
   function buildGame() {
     App.screen = 'game';
     $('#app').innerHTML = '<div id="game"><div id="topbar">' +
-      '<span class="dot on" id="tb-conn"></span><span class="tb" id="tb-round"></span><span class="tb" id="tb-timer"></span>' +
+      '<span class="dot on" id="tb-conn"></span><span class="tb" id="tb-round"></span><span class="tb season" id="tb-season"></span><span class="tb" id="tb-timer"></span>' +
       '<span class="tb" id="tb-gold"></span><span class="tb" id="tb-glory"></span><span class="sp"></span>' +
       '<button class="btn wood" id="b-dip">Союзы</button><button class="btn wood" id="b-log">Летопись</button><button class="btn ghost" id="b-menu">☰</button></div>' +
       '<div id="main"><div id="mapwrap"><div id="mapscroll"><div id="mapbox"><canvas id="map"></canvas><canvas id="mapfx"></canvas></div></div>' +
       '<div id="zoom"><button class="btn small wood" id="z-in">＋</button><button class="btn small wood" id="z-out">－</button></div><div id="phasebadge"></div><div id="maphint"></div></div>' +
       '<div id="panel"><div id="panel-body"></div><div id="panel-foot"></div></div></div></div>';
     $('#map').addEventListener('click', function (e) { onMapTap(M.pick(e.clientX, e.clientY)); });
+    $('#tb-season').onclick = function () { var s = E.season(App.st), nx = CH.SEASONS[CH.seasonOf(App.st.round + 1)]; toast(s.name + ': ' + s.desc + ' Дальше — ' + nx.name.toLowerCase() + ': ' + nx.short + '.'); };
     $('#z-in').onclick = function () { A.play('click'); M.stepZoom(1); };
     $('#z-out').onclick = function () { A.play('click'); M.stepZoom(-1); };
     $('#b-dip').onclick = function () { A.play('click'); showDip(); };
@@ -3392,13 +3678,15 @@ CH.RULES = [
   function renderTop() {
     var st = App.st, pl = me();
     $('#tb-round').innerHTML = 'Раунд ' + st.round + '/' + st.maxRounds;
+    var ss = E.season(st), nxs = CH.SEASONS[CH.seasonOf(st.round + 1)];
+    $('#tb-season').innerHTML = S.img('s_' + ss.id, 3) + ss.name + (st.round < st.maxRounds ? ' <span class="nx">→ ' + nxs.name + '</span>' : '');
     if (pl) {
       var left = budget(), net = netIncome();
       $('#tb-gold').innerHTML = S.img('e_coin', 2) + (App.phase === 'orders' && left !== pl.gold ? left + '<span class="muted">/' + pl.gold + '</span>' : pl.gold) +
         (pl.alive ? ' <span class="net' + (net < 0 ? ' neg' : '') + '">' + signed(net) + '</span>' : '');
       $('#tb-glory').innerHTML = S.img('e_star', 2) + pl.glory + (pl.alive ? ' <span class="net">+' + E.gloryIncome(st, App.you) + '</span>' : '');
     } else { $('#tb-gold').innerHTML = '<span class="muted">зритель</span>'; $('#tb-glory').innerHTML = ''; }
-    var badge = App.phase === 'orders' ? 'Приказы · ' + App.orderTime + ' с на раунд' : App.phase === 'report' ? 'Итоги раунда' : App.phase === 'over' ? 'Конец' : '';
+    var badge = App.phase === 'orders' ? 'Приказы · ' + App.orderTime + ' с · ' + E.season(st).name.toLowerCase() + ': ' + E.season(st).short : App.phase === 'report' ? 'Итоги раунда' : App.phase === 'over' ? 'Конец' : '';
     $('#phasebadge').textContent = badge;
     var hint = '';
     if (App.phase === 'orders' && pl && pl.alive) {
@@ -3556,7 +3844,8 @@ CH.RULES = [
     var ab = CH.ACTIVES[pl.hero.active], h = '';
     h += '<div class="hero-mini">' + S.portrait(pl.hero, 3) + '<div><div class="pt" style="color:' + pl.hero.color + '">' + esc(pl.hero.name) + '</div><div class="sub">' + esc(pl.hero.title) + '</div></div></div>';
     if (!pl.alive) return h + '<div class="ev"><h3>Ты повержен</h3><div class="small">Голова на пике, имя в летописи. Досмотри, кто победит.</div></div>' + standingsMini();
-    var inc = E.income(st, App.you), up = E.upkeep(st, App.you), units = E.playerUnits(st, App.you);
+    var inc = E.income(st, App.you), up = E.upkeep(st, App.you), units = E.playerUnits(st, App.you), ssn = E.season(st), nxt = CH.SEASONS[CH.seasonOf(st.round + 1)];
+    h += '<div class="seasonbar">' + S.img('s_' + ssn.id, 3) + '<div><b>' + ssn.name + '</b>: ' + esc(ssn.desc) + (st.round < st.maxRounds ? '<br><span class="muted">Следующий раунд — ' + nxt.name.toLowerCase() + ': ' + nxt.short + '.</span>' : '') + '</div></div>';
     h += '<div class="sec">Казна за раунд</div><table class="money"><tr><td>Доход с земель и строений</td><td class="good">+' + inc + '</td></tr>' +
       '<tr><td>Жалованье войску</td><td class="bad">−' + up + '</td></tr><tr class="tot"><td>Итого</td><td>' + signed(inc - up) + ' ' + S.img('e_coin', 1) + '</td></tr>' +
       '<tr><td>Слава</td><td>+' + E.gloryIncome(st, App.you) + ' ' + S.img('e_star', 1) + '</td></tr></table>' +
@@ -3735,6 +4024,7 @@ CH.RULES = [
     var neutralB = playerBattles.length - myB.length - otherB.length;
     var h = '<div class="row"><h2 class="sp">Летопись: раунд ' + rep.round + '</h2><button class="btn small ghost" data-rep="close">✕</button></div>';
     if (pl) h += '<div class="small">Тебе за раунд: <b>' + signed(rep.income[App.you] || 0) + '</b> ' + S.img('e_coin', 1) + (rep.upkeep && rep.upkeep[App.you] ? ' <span class="muted">(жалованье −' + rep.upkeep[App.you] + ' уже вычтено)</span>' : '') + ' · <b>' + signed(rep.glory[App.you] || 0) + '</b> ' + S.img('e_star', 1) + '</div>';
+    if (!rep.winner) { var ns = E.season(st); h += '<div class="seasonbar">' + S.img('s_' + ns.id, 3) + '<div>Наступает <b>' + ns.name.toLowerCase() + '</b>: ' + esc(ns.desc) + '</div></div>'; }
     if (rep.event) h += '<div class="ev"><h3>' + esc(rep.event.name) + '</h3><div class="small">' + esc(rep.event.text) + '</div>' + (rep.event.detail ? '<div class="small" style="margin-top:3px"><b>' + esc(rep.event.detail) + '</b></div>' : '') + '</div>';
     if (rep.lines.length) h += '<div class="lines">' + rep.lines.map(function (l) { return '<div>' + esc(l) + '</div>'; }).join('') + '</div>';
     if (myB.length) h += '<div class="sec">Твои битвы</div>' + myB.map(battleLine).join('');
@@ -3819,15 +4109,20 @@ CH.RULES = [
     };
     $('#chatin').onkeydown = function (e) { if (e.key === 'Enter' && this.value.trim()) { App.send({ t: 'chat', text: this.value }); this.value = ''; } };
   }
-  function renderChat() {
-    var c = $('#dipchat'); if (!c) return;
-    c.innerHTML = App.chat.map(function (m) {
-      if (m.from == null) return '<div class="sys">' + esc(m.text) + '</div>';
-      var nm = App.st ? heroName(m.from) : m.nick, col = App.st ? colorOf(m.from) : '#fff';
-      return '<div><b style="color:' + col + '">' + esc(nm) + ':</b> ' + esc(m.text) + '</div>';
-    }).join('');
-    c.scrollTop = c.scrollHeight;
+  function chatLine(m) {
+    if (m.from == null) return '<div class="sys">' + esc(m.text) + '</div>';
+    var inGame = App.st && E.player(App.st, m.from);
+    var nm = inGame ? heroName(m.from) : m.nick, col = inGame ? colorOf(m.from) : (m.color || '#efe2bf');
+    return '<div><b style="color:' + col + '">' + esc(nm) + ':</b> ' + esc(m.text) + '</div>';
   }
+  function renderChat() {
+    ['#dipchat', '#lobbychat'].forEach(function (sel) {
+      var c = $(sel); if (!c) return;
+      c.innerHTML = App.chat.length ? App.chat.map(chatLine).join('') : '<div class="muted small">Пока тихо. Самое время кого-нибудь оскорбить.</div>';
+      c.scrollTop = c.scrollHeight;
+    });
+  }
+
   var offerShown = {};
   function showAllyOffer(from) {
     var key = App.st.round + ':' + from; if (offerShown[key]) return; offerShown[key] = 1;
@@ -3897,7 +4192,7 @@ CH.RULES = [
     }).join('');
     var ov = modal((iWon ? '<div class="winbig">ПОБЕДА!</div>' : '<div class="losebig">' + (me() ? 'ПОРАЖЕНИЕ' : 'КОНЕЦ') + '</div>') +
       '<div class="row" style="justify-content:center;margin:6px 0">' + w.pids.map(function (p) { return S.portrait(E.player(st, p).hero, 5); }).join('') + '</div>' +
-      '<p class="small" style="text-align:center">' + esc(reason) + '</p>' +
+      '<p class="small" style="text-align:center">' + esc(reason) + (st.map && CH.MAPS[st.map] ? '<br><span class="muted">Карта: ' + CH.MAPS[st.map].name + '</span>' : '') + '</p>' +
       '<canvas id="gchart" width="300" height="90" style="width:100%;max-width:420px;height:auto;display:block;margin:6px auto;background:#0004"></canvas>' +
       '<table class="standings" style="width:100%">' + rows + '</table>' +
       '<div class="row" style="justify-content:center;margin-top:8px">' + (App.isHost ? '<button class="btn gold" id="e-again">Ещё катку!</button>' : '<span class="small muted">Хост может начать новую катку.</span>') +
